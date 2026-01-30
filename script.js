@@ -2,38 +2,36 @@ const pwr = document.getElementById('pwr');
 const vfd = document.getElementById('vfd');
 const nl = document.getElementById('needle-l');
 const nr = document.getElementById('needle-r');
+const led = document.querySelector('.power-led');
 
-// L'appareil est ON visuellement au départ
+// L'application démarre ON par défaut (selon tes réglages précédents)
 let isOn = true;
-// Mais l'animation des aiguilles est OFF au lancement
 let isAnimating = false;
 
-// On active la LED du bouton dès le départ
-pwr.classList.add('active');
+// Initialisation visuelle
+led.classList.add('active');
 
-// Gestion du bouton Power
+// Le bouton Standby déclenche maintenant une réinitialisation complète
 pwr.addEventListener('click', () => {
-    isOn = !isOn;
-    // Une fois qu'on a cliqué, les aiguilles sont autorisées à bouger
-    isAnimating = true; 
+    // Petit effet visuel optionnel avant le reload
+    pwr.style.transform = "translateY(2px)";
     
-    pwr.classList.toggle('active');
-    vfd.style.opacity = isOn ? "1" : "0.1";
+    // Réinitialise l'application (recharge la page)
+    location.reload();
 });
 
 // Animation des aiguilles
 function loop() {
-    // Les aiguilles ne bougent QUE si l'appareil est ON ET que l'utilisateur a activé l'animation via le clic
+    // Elles ne bougent que si isOn est true ET qu'une action a eu lieu
+    // Note : avec location.reload(), isAnimating repassera toujours à false au départ
     if (isOn && isAnimating) {
         nl.style.transform = `rotate(${-45 + Math.random() * 90}deg)`;
         nr.style.transform = `rotate(${-45 + Math.random() * 90}deg)`;
     } else {
-        // Position de repos (-55deg) au lancement et quand c'est OFF
         nl.style.transform = `rotate(-55deg)`;
         nr.style.transform = `rotate(-55deg)`;
     }
     setTimeout(loop, 120);
 }
 
-// Lancement de la boucle
 loop();

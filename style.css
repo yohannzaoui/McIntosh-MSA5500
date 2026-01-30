@@ -82,10 +82,9 @@ body {
 .brand-center { flex: 1; display: flex; justify-content: center; }
 .brand-logo-img { height: 85px; }
 
-/* MODIFICATION ICI : Position absolue pour ne pas pousser les boutons */
 .display-area { 
     position: absolute;
-    top: 360px; /* Centre l'écran verticalement entre le haut et le bas */
+    top: 360px; 
     left: 50%;
     transform: translateX(-50%);
     display: flex; 
@@ -107,7 +106,7 @@ body {
     font-family: 'Courier New', monospace;
     text-shadow: 0 0 15px var(--mc-blue); 
     letter-spacing: 4px;
-    opacity: 1; /* Changé de 0.1 à 1 pour qu'il soit allumé au départ */
+    opacity: 1; 
 }
 
 .vfd-small { font-size: 18px; margin-bottom: 5px; }
@@ -203,15 +202,30 @@ body {
 }
 .btn-base:active { transform: translateY(2px); box-shadow: 0 2px 0 #111; }
 
-.power-btn { background: linear-gradient(to bottom, #8a0000, #4a0000); }
-.power-btn.active { background: #ff0000; box-shadow: 0 0 15px red, 0 2px 0 #111; }
-.black-btn { background: linear-gradient(to bottom, #333, #111); }
+.power-btn { 
+    background: #a10202; /* Couleur fixe demandée */
+}
+
+/* La classe .active ne change plus la couleur du bouton */
+.power-btn.active { 
+    background: #a10202; 
+    box-shadow: 0 4px 0 #111; 
+}
 
 .power-led {
-    width: 8px; height: 8px; background: #ff0000;
-    box-shadow: 0 0 10px #ff0000; border-radius: 50%; border: 1px solid #000;
+    width: 8px; height: 8px; background: #440000;
+    border-radius: 50%; border: 1px solid #000;
     margin-bottom: 6px;
+    transition: background 0.2s, box-shadow 0.2s;
 }
+
+/* C'est la LED qui réagit visuellement à l'état actif */
+.power-led.active {
+    background: #ff0000;
+    box-shadow: 0 0 10px #ff0000;
+}
+
+.black-btn { background: linear-gradient(to bottom, #333, #111); }
 
 .bottom-label-reset { 
     position: absolute;
