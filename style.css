@@ -149,7 +149,7 @@ body {
 }
 
 .knob-inner {
-    width: 110px; /* BORDURE 15PX GARANTIE */
+    width: 110px; /* BORDURE 15PX MAINTENUE */
     height: 110px;
     background: radial-gradient(circle, #333, #000);
     border-radius: 50%;
@@ -168,7 +168,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 60px;
+    width: 80px; /* Légèrement augmenté pour accommoder les boutons de 65px */
     position: relative;
 }
 
@@ -191,22 +191,31 @@ body {
 
 .small-label i { font-size: 14px; color: var(--mc-green); }
 
+/* --- MISE À JOUR DES BOUTONS DU BAS --- */
 .btn-base {
-    width: 45px;
-    height: 28px;
-    border: 2px solid #222;
-    border-radius: 5px;
+    background: linear-gradient(180deg, #1d1d1d, #050505);
+    border: 3px solid #2e2e2e;
+    width: 65px;
+    height: 45px;
+    border-radius: 15px;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
     box-shadow: 0 4px 0 #111;
-    transition: all 0.1s;
+    box-sizing: border-box;
 }
-.btn-base:active { transform: translateY(2px); box-shadow: 0 2px 0 #111; }
+
+.btn-base:active { 
+    transform: translateY(2px); 
+    box-shadow: 0 2px 0 #111; 
+}
 
 .power-btn { 
-    background: #a10202; /* Couleur fixe demandée */
+    background: #a10202; /* Couleur fixe */
 }
 
-/* La classe .active ne change plus la couleur du bouton */
 .power-btn.active { 
     background: #a10202; 
     box-shadow: 0 4px 0 #111; 
@@ -219,13 +228,12 @@ body {
     transition: background 0.2s, box-shadow 0.2s;
 }
 
-/* C'est la LED qui réagit visuellement à l'état actif */
 .power-led.active {
     background: #ff0000;
     box-shadow: 0 0 10px #ff0000;
 }
 
-.black-btn { background: linear-gradient(to bottom, #333, #111); }
+/* Le dégradé est déjà géré par .btn-base pour les black-btn */
 
 .bottom-label-reset { 
     position: absolute;
