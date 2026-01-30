@@ -1,4 +1,4 @@
-// --- SÃ‰LECTEURS ---
+// --- SELECTEURS ---
 const nl = document.getElementById('needle-l');
 const nr = document.getElementById('needle-r');
 const vfdLarge = document.querySelector('.vfd-large');
@@ -10,7 +10,13 @@ const bitrateDisplay = document.getElementById('bitrate');
 const inputBtn = document.getElementById('input-knob'); 
 const fileUpload = document.getElementById('audio-upload');
 const playPauseBtn = document.getElementById('play-pause');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const stopBtn = document.getElementById('stop-btn');
+const muteBtn = document.getElementById('mute-btn');
+const volumeKnob = document.getElementById('volume-knob');
 const pwr = document.getElementById('pwr');
+const powerLed = document.querySelector('.power-led');
 const audio = document.getElementById('main-audio');
 
 // --- VARIABLES ---
@@ -20,17 +26,45 @@ let audioCtx = null;
 let analyser = null;
 let dataArray = null;
 let source = null;
+let isPoweredOn = false;
+let isMuted = false;
 
 let currentAngleL = -55;
 let currentAngleR = -55;
+let targetAngleL = -55;
+let targetAngleR = -55;
 
-// --- MOTEUR AUDIO (SIMPLE & DIRECT) ---
+// --- POWER ON/OFF ---
+pwr.addEventListener('click', () => {
+    isPoweredOn = !isPoweredOn;
+    powerLed.classList.toggle('active', isPoweredOn);
+    
+    if (!isPoweredOn) {
+        audio.pause();
+        audio.currentTime = 0;
+        vfdSmall.textContent = "STANDBY MODE";
+        vfdLarge.textContent = "SYSTEM OFF";
+        vfdInfo.textContent = "";
+    } else {
+        vfdSmall.textContent = "READY TO CONNECT";
+        vfdLarge.textContent = "SELECT INPUT";
+        if (playlist.length > 0) {
+            loadTrack(currentIndex);
+        }
+    }
+});
+
+// --- MOTEUR AUDIO (OPTIMISE) ---
 function initEngine() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256; // Petit buffer = Grande rÃ©activitÃ©
-        analyser.smoothingTimeConstant = 0.3; // TrÃ¨s peu de lissage pour marquer le rythme
+        
+        // Configuration optimisee pour les VU metres
+        analyser.fftSize = 512; // Plus de precision
+        analyser.smoothingTimeConstant = 0.6; // Lissage modere
+        analyser.minDecibels = -90;
+        analyser.maxDecibels = -10;
         
         dataArray = new Uint8Array(analyser.frequencyBinCount);
         source = audioCtx.createMediaElementSource(audio);
@@ -40,9 +74,9 @@ function initEngine() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
-// --- CHARGEMENT SANS Ã‰CHEC ---
+// --- CHARGEMENT FICHIER ---
 function loadTrack(index) {
-    if (playlist.length === 0) return;
+    if (playlist.length === 0 || !isPoweredOn) return;
     
     currentIndex = index;
     const file = playlist[currentIndex];
@@ -66,69 +100,161 @@ function loadTrack(index) {
             onSuccess: (tag) => {
                 const t = tag.tags;
                 vfdLarge.textContent = (t.title || file.name).toUpperCase().substring(0, 25);
-                vfdInfo.textContent = `${t.artist || "UNKNOWN"} â€” ${t.album || "UNKNOWN"}`.toUpperCase();
+                vfdInfo.textContent = `${t.artist || "UNKNOWN"} – ${t.album || "UNKNOWN"}`.toUpperCase();
             },
             onError: () => {
                 vfdLarge.textContent = file.name.toUpperCase().substring(0, 25);
+                vfdInfo.textContent = "ARTIST – ALBUM";
             }
         });
     }
 
-    // DÃ©blocage et lecture forcÃ©e
+    // Demarrage automatique
     initEngine();
-    audio.play().catch(e => console.warn("Cliquez sur Play pour dÃ©marrer"));
+    audio.play().catch(e => console.warn("Interaction requise"));
 }
 
-// --- Ã‰VÃ‰NEMENTS ---
-inputBtn.addEventListener('click', () => fileUpload.click());
+// --- EVENEMENTS ---
+inputBtn.addEventListener('click', () => {
+    fileUpload.click();
+});
 
 fileUpload.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
+        // Auto power on si eteint
+        if (!isPoweredOn) {
+            isPoweredOn = true;
+            powerLed.classList.add('active');
+        }
+        
         playlist = Array.from(e.target.files);
         loadTrack(0);
     }
 });
 
 playPauseBtn.addEventListener('click', () => {
+    if (!isPoweredOn || playlist.length === 0) return;
     initEngine();
     audio.paused ? audio.play() : audio.pause();
 });
 
-pwr.addEventListener('click', () => window.location.reload());
+prevBtn.addEventListener('click', () => {
+    if (!isPoweredOn || playlist.length === 0) return;
+    if (currentIndex > 0) {
+        loadTrack(currentIndex - 1);
+    }
+});
+
+nextBtn.addEventListener('click', () => {
+    if (!isPoweredOn || playlist.length === 0) return;
+    if (currentIndex < playlist.length - 1) {
+        loadTrack(currentIndex + 1);
+    }
+});
+
+stopBtn.addEventListener('click', () => {
+    if (!isPoweredOn) return;
+    audio.pause();
+    audio.currentTime = 0;
+});
+
+muteBtn.addEventListener('click', () => {
+    if (!isPoweredOn) return;
+    isMuted = !isMuted;
+    audio.muted = isMuted;
+    muteBtn.style.opacity = isMuted ? '0.5' : '1';
+});
+
+// Controle volume avec molette
+let currentVolume = 0.7;
+audio.volume = currentVolume;
+
+volumeKnob.addEventListener('wheel', (e) => {
+    if (!isPoweredOn) return;
+    e.preventDefault();
+    
+    if (e.deltaY < 0) {
+        currentVolume = Math.min(1, currentVolume + 0.05);
+    } else {
+        currentVolume = Math.max(0, currentVolume - 0.05);
+    }
+    
+    audio.volume = currentVolume;
+    volumeKnob.style.transform = `rotate(${currentVolume * 270 - 135}deg)`;
+});
 
 audio.onended = () => {
     if (currentIndex < playlist.length - 1) loadTrack(currentIndex + 1);
 };
 
-// --- ANIMATION "BEAT-SYNC" (RÃ‰ACTION AUX BASSES) ---
+// --- ANIMATION VU METRES (CORRIGEE) ---
 function animate() {
     requestAnimationFrame(animate);
     
-    if (analyser && !audio.paused) {
+    if (analyser && !audio.paused && isPoweredOn) {
         analyser.getByteFrequencyData(dataArray);
         
-        // On cible uniquement les 3 premiÃ¨res bandes (Basses trÃ¨s profondes / Kick)
-        let bass = 0;
-        for (let i = 0; i < 3; i++) { bass += dataArray[i]; }
-        let level = bass / 3;
-
-        // Calcul de l'angle cible
-        let targetAngle = -55 + (level / 1.2); 
-        if (targetAngle > 40) targetAngle = 40;
-
-        // "Attack" rapide (0.4) et "Release" un peu plus lente (0.2)
-        let speed = (targetAngle > currentAngleL) ? 0.4 : 0.2;
-
-        currentAngleL += (targetAngle - currentAngleL) * speed;
-        currentAngleR += (targetAngle - currentAngleR) * (speed * 0.95);
+        // Calcul separe pour canal gauche et droit (simulation)
+        let bassL = 0;
+        let bassR = 0;
+        let midL = 0;
+        let midR = 0;
         
-        const jitter = (Math.random() * 0.5);
-        nl.style.transform = `rotate(${currentAngleL + jitter}deg)`;
-        nr.style.transform = `rotate(${currentAngleR + jitter}deg)`;
+        // Basses (0-5 bins) - kick et sub-bass
+        for (let i = 0; i < 5; i++) {
+            bassL += dataArray[i];
+        }
+        
+        // Mediums-aigus (5-15 bins) pour plus de dynamique
+        for (let i = 5; i < 15; i++) {
+            midL += dataArray[i];
+        }
+        
+        // Simulation stereo avec leger decalage
+        bassR = bassL * 0.95;
+        midR = midL * 1.05;
+        
+        // Mix pondre: 70% basses + 30% mediums
+        let levelL = (bassL * 0.7 + midL * 0.3) / 10;
+        let levelR = (bassR * 0.7 + midR * 0.3) / 10;
+        
+        // Mapping vers angles (-55deg a +40deg = 95deg de course)
+        // Normalisation: 0-255 -> -55 a +40
+        targetAngleL = -55 + (levelL / 255) * 95;
+        targetAngleR = -55 + (levelR / 255) * 95;
+        
+        // Limitation
+        targetAngleL = Math.max(-55, Math.min(40, targetAngleL));
+        targetAngleR = Math.max(-55, Math.min(40, targetAngleR));
+        
+        // Interpolation douce avec attack/release
+        let attackSpeed = 0.5;  // Montee rapide
+        let releaseSpeed = 0.15; // Descente plus lente
+        
+        if (targetAngleL > currentAngleL) {
+            currentAngleL += (targetAngleL - currentAngleL) * attackSpeed;
+        } else {
+            currentAngleL += (targetAngleL - currentAngleL) * releaseSpeed;
+        }
+        
+        if (targetAngleR > currentAngleR) {
+            currentAngleR += (targetAngleR - currentAngleR) * attackSpeed;
+        } else {
+            currentAngleR += (targetAngleR - currentAngleR) * releaseSpeed;
+        }
+        
+        // Application avec micro-jitter pour realisme
+        const jitterL = (Math.random() - 0.5) * 0.8;
+        const jitterR = (Math.random() - 0.5) * 0.8;
+        
+        nl.style.transform = `rotate(${currentAngleL + jitterL}deg)`;
+        nr.style.transform = `rotate(${currentAngleR + jitterR}deg)`;
+        
     } else {
         // Retour progressif au repos
-        currentAngleL += (-55 - currentAngleL) * 0.1;
-        currentAngleR += (-55 - currentAngleR) * 0.1;
+        currentAngleL += (-55 - currentAngleL) * 0.08;
+        currentAngleR += (-55 - currentAngleR) * 0.08;
+        
         nl.style.transform = `rotate(${currentAngleL}deg)`;
         nr.style.transform = `rotate(${currentAngleR}deg)`;
     }
