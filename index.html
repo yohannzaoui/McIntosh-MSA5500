@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>McIntosh MSA5500 - Full Transport Controls</title>
+    <title>McIntosh MSA5500 - Reset White Label</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
             --mc-blue: #00c3ff;
@@ -99,17 +100,37 @@
             opacity: 0.1;
         }
 
+        /* --- TES PARAMÈTRES MÉMORISÉS --- */
         .knob-section {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
             height: 180px;
-            padding-bottom: -10px; /* Aligné à 15px du bas */
+            padding-bottom: -10px;
             margin-top: auto;
         }
 
-        .knob-wrapper { display: flex; flex-direction: column; align-items: center; width: 220px; }
-        .label-green { color: var(--mc-green); font-size: 16px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+        .controls-center-group {
+            display: flex;
+            align-items: flex-end;
+            gap: 25px;
+            transform: translateY(10px);
+        }
+
+        .knob-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            width: 220px;
+        }
+
+        .label-green { 
+            color: var(--mc-green); 
+            font-size: 16px; 
+            font-weight: bold; 
+            margin-bottom: 15px; 
+            text-transform: uppercase; 
+        }
 
         .knob-outer {
             width: 140px; height: 140px;
@@ -121,13 +142,6 @@
             width: 132px; height: 132px;
             background: radial-gradient(circle, #333, #000);
             border-radius: 50%;
-        }
-
-        .controls-center-group {
-            display: flex;
-            align-items: flex-end;
-            gap: 25px; /* Réduit légèrement l'espace pour faire tenir les 8 boutons */
-            padding-bottom: 0px;
         }
 
         .button-unit {
@@ -145,6 +159,21 @@
             justify-content: flex-end;
             align-items: center;
             margin-bottom: 12px;
+        }
+
+        .small-label { 
+            color: var(--mc-green); 
+            font-size: 10px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            text-align: center; 
+            white-space: nowrap; 
+        }
+
+        .small-label i { 
+            font-size: 14px; 
+            color: var(--mc-green); 
+            font-weight: bold;
         }
 
         .btn-base {
@@ -169,14 +198,14 @@
             margin-bottom: 6px;
         }
         
-        .small-label { color: #555; font-size: 10px; font-weight: bold; text-transform: uppercase; text-align: center; white-space: nowrap; }
-        
+        /* --- RESET EN BLANC --- */
         .bottom-label-reset { 
             position: absolute;
             top: 100%;
             padding-top: 4px;
             left: 50%;
             transform: translateX(-50%);
+            color: #ffffff; /* Couleur blanche pour RESET */
         }
     </style>
 </head>
@@ -189,57 +218,17 @@
         <div class="meter-container">
             <div class="meter">
                 <svg class="meter-svg" viewBox="0 0 550 300">
-                    <style>text { font-family: Arial; font-weight: bold; fill: black; }</style>
                     <text x="275" y="40" font-size="14" text-anchor="middle" opacity="0.6">8 OHMS</text>
                     <path d="M80 180 Q 275 90 470 180" fill="none" stroke="black" stroke-width="4" stroke-dasharray="45,10"/>
-                    <g font-size="14">
-                        <text x="85" y="160" transform="rotate(-25 85,160)">1m</text>
-                        <text x="150" y="135" transform="rotate(-15 150,135)">.01</text>
-                        <text x="225" y="125" transform="rotate(-5 225,125)">.1</text>
-                        <text x="305" y="125" transform="rotate(5 305,125)">1</text>
-                        <text x="380" y="135" transform="rotate(15 380,135)">10</text>
-                        <text x="445" y="160" transform="rotate(25 445,160)">100</text>
-                    </g>
-                    <g font-size="14">
-                        <text x="115" y="195" transform="rotate(-20 115,195)">2m</text>
-                        <text x="180" y="210" transform="rotate(-10 180,210)">.02</text>
-                        <text x="245" y="218" transform="rotate(-3 245,218)">.2</text>
-                        <text x="325" y="218" transform="rotate(3 325,218)">2</text>
-                        <text x="390" y="210" transform="rotate(10 390,210)">20</text>
-                        <text x="450" y="195" transform="rotate(20 450,195)">200</text>
-                    </g>
-                    <text x="275" y="250" font-size="14" text-anchor="middle" opacity="0.6">4 OHMS</text>
                     <text x="275" y="285" font-size="22" text-anchor="middle" letter-spacing="4">POWER OUTPUT</text>
                 </svg>
                 <div class="needle" id="needle-l"></div>
             </div>
-            
-            <div class="brand-center">
-                <img src="img/mc-logo.png" alt="McIntosh" class="brand-logo-img">
-            </div>
-
+            <div class="brand-center"><img src="img/mc-logo.png" alt="McIntosh" class="brand-logo-img"></div>
             <div class="meter">
                 <svg class="meter-svg" viewBox="0 0 550 300">
-                    <style>text { font-family: Arial; font-weight: bold; fill: black; }</style>
                     <text x="275" y="40" font-size="14" text-anchor="middle" opacity="0.6">8 OHMS</text>
                     <path d="M80 180 Q 275 90 470 180" fill="none" stroke="black" stroke-width="4" stroke-dasharray="45,10"/>
-                    <g font-size="14">
-                        <text x="85" y="160" transform="rotate(-25 85,160)">1m</text>
-                        <text x="150" y="135" transform="rotate(-15 150,135)">.01</text>
-                        <text x="225" y="125" transform="rotate(-5 225,125)">.1</text>
-                        <text x="305" y="125" transform="rotate(5 305,125)">1</text>
-                        <text x="380" y="135" transform="rotate(15 380,135)">10</text>
-                        <text x="445" y="160" transform="rotate(25 445,160)">100</text>
-                    </g>
-                    <g font-size="14">
-                        <text x="115" y="195" transform="rotate(-20 115,195)">2m</text>
-                        <text x="180" y="210" transform="rotate(-10 180,210)">.02</text>
-                        <text x="245" y="218" transform="rotate(-3 245,218)">.2</text>
-                        <text x="325" y="218" transform="rotate(3 325,218)">2</text>
-                        <text x="390" y="210" transform="rotate(10 390,210)">20</text>
-                        <text x="450" y="195" transform="rotate(20 450,195)">200</text>
-                    </g>
-                    <text x="275" y="250" font-size="14" text-anchor="middle" opacity="0.6">4 OHMS</text>
                     <text x="275" y="285" font-size="22" text-anchor="middle" letter-spacing="4">POWER OUTPUT</text>
                 </svg>
                 <div class="needle" id="needle-r"></div>
@@ -261,22 +250,21 @@
 
             <div class="controls-center-group">
                 <div class="button-unit">
-                    <div class="label-zone"><span class="small-label">PREV</span></div>
+                    <div class="label-zone"><span class="small-label"><i class="fas fa-step-backward"></i></span></div>
                     <div class="btn-base black-btn"></div>
                 </div>
                 <div class="button-unit">
-                    <div class="label-zone"><span class="small-label">NEXT</span></div>
+                    <div class="label-zone"><span class="small-label"><i class="fas fa-step-forward"></i></span></div>
                     <div class="btn-base black-btn"></div>
                 </div>
                 <div class="button-unit">
-                    <div class="label-zone"><span class="small-label">PLAY</span></div>
+                    <div class="label-zone"><span class="small-label"><i class="fas fa-play"></i>&nbsp;&nbsp;<i class="fas fa-pause"></i></span></div>
                     <div class="btn-base black-btn"></div>
                 </div>
                 <div class="button-unit">
-                    <div class="label-zone"><span class="small-label">STOP</span></div>
+                    <div class="label-zone"><span class="small-label"><i class="fas fa-stop"></i></span></div>
                     <div class="btn-base black-btn"></div>
                 </div>
-                
                 <div class="button-unit">
                     <div class="label-zone"><span class="small-label">MUTE</span></div>
                     <div class="btn-base black-btn"></div>
@@ -305,7 +293,6 @@
             </div>
         </div>
     </div>
-
     <div class="side-trim side-right"></div>
 </div>
 
@@ -324,10 +311,8 @@
 
     function loop() {
         if (isOn) {
-            let rL = -45 + Math.random() * 90;
-            let rR = -45 + Math.random() * 90;
-            nl.style.transform = `rotate(${rL}deg)`;
-            nr.style.transform = `rotate(${rR}deg)`;
+            nl.style.transform = `rotate(${-45 + Math.random() * 90}deg)`;
+            nr.style.transform = `rotate(${-45 + Math.random() * 90}deg)`;
         } else {
             nl.style.transform = `rotate(-55deg)`;
             nr.style.transform = `rotate(-55deg)`;
@@ -336,6 +321,5 @@
     }
     loop();
 </script>
-
 </body>
 </html>
