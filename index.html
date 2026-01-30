@@ -2,13 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>McIntosh MSA5500 - XXL Fidelity</title>
+    <title>McIntosh MSA5500 - XXL Fidelity Fixed</title>
     <style>
         :root {
             --mc-blue: #00c3ff;
             --mc-green: #00ff41;
+            --mc-vumeter: #00aef2; 
             --panel-black: #080808;
-            --knob-silver: #e0e0e0;
+            --knob-silver: #c0c0c0;
         }
 
         body {
@@ -19,95 +20,81 @@
             height: 100vh;
             margin: 0;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            overflow: hidden; /* Empêche le scroll si l'écran est petit */
+            overflow: hidden;
         }
 
-        /* Panneau Principal Ajusté */
         .amplifier-panel {
             width: 1750px;
-            height: 650px;
+            height: 750px;
             background: var(--panel-black);
             position: relative;
             border-bottom: 8px solid #1a1a1a;
             box-shadow: 0 60px 120px rgba(0,0,0,0.9), inset 0 1px 2px rgba(255,255,255,0.1);
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 30px 40px;
             box-sizing: border-box;
         }
 
-        /* Poignées Latérales - Plus larges pour l'échelle */
         .side-trim {
             position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 50px;
+            top: 0; bottom: 0; width: 50px;
             background: linear-gradient(to right, #ccc, #eee 40%, #888 60%, #ddd);
             box-shadow: inset -1px 0 5px rgba(0,0,0,0.4);
+            z-index: 10;
         }
         .side-left { left: -50px; border-radius: 8px 0 0 8px; }
         .side-right { right: -50px; border-radius: 0 8px 8px 0; }
 
-        /* VU-Mètres XXL */
         .meter-container {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 40px 80px;
+            align-items: flex-start;
+            height: 300px;
         }
 
         .meter {
-            width: 550px; /* Largement agrandi */
+            width: 550px;
             height: 280px;
-            background: #002b44;
+            background: var(--mc-vumeter); 
             border: 2px solid #000;
             position: relative;
-            box-shadow: inset 0 0 60px #00aaff, inset 0 0 120px rgba(0,0,0,0.9);
+            box-shadow: inset 0 0 60px rgba(0, 174, 242, 0.8), inset 0 0 120px rgba(0,0,0,0.6);
             overflow: hidden;
+        }
+
+        .meter-scale {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="550" height="280" viewBox="0 0 550 280"><path d="M50 200 Q 275 100 500 200" fill="none" stroke="black" stroke-width="2" opacity="0.8"/><text x="275" y="240" fill="black" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" opacity="0.9">POWER OUTPUT</text><text x="60" y="180" fill="black" font-size="12" font-weight="bold" opacity="0.8">.01</text><text x="140" y="140" fill="black" font-size="12" font-weight="bold" opacity="0.8">.1</text><text x="275" y="120" fill="black" font-size="12" font-weight="bold" opacity="0.8">1</text><text x="410" y="140" fill="black" font-size="12" font-weight="bold" opacity="0.8">10</text><text x="480" y="180" fill="black" font-size="12" font-weight="bold" opacity="0.8">100</text></svg>');
+            background-repeat: no-repeat;
         }
 
         .needle {
             position: absolute;
-            bottom: -30px;
-            left: 50%;
-            width: 3px; /* Plus épaisse */
-            height: 240px; /* Plus longue */
+            bottom: -30px; left: 50%; width: 3px; height: 240px;
             background: #111;
             transform-origin: bottom center;
-            transform: rotate(-45deg);
+            transform: rotate(-50deg);
             transition: transform 0.15s cubic-bezier(0.1, 0.5, 0.5, 1);
             z-index: 5;
         }
 
-        /* Marque Centrale */
-        .brand-center {
+        .brand-center { flex: 1; text-align: center; }
+        .brand-logo-img { height: 100px; margin-top: 10px; }
+
+        .display-area {
             flex: 1;
-            text-align: center;
-            color: var(--mc-green);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .brand-logo {
-            font-size: 72px; /* Logo imposant */
-            font-weight: bold;
-            font-family: "Times New Roman", serif;
-            letter-spacing: 3px;
-            text-shadow: 0 0 15px rgba(0, 255, 65, 0.7);
-            margin-bottom: 10px;
-        }
-
-        .model-info {
-            font-size: 18px;
-            letter-spacing: 4px;
-            line-height: 1.5;
-            opacity: 0.9;
-        }
-
-        /* L'écran Matrix VFD Agrandi */
         .matrix-display {
             width: 700px;
-            height: 140px;
+            height: 130px;
             background: #020202;
-            margin: 20px auto;
             border: 2px solid #1a1a1a;
             box-shadow: inset 0 0 30px #000;
             display: flex;
@@ -118,109 +105,106 @@
             font-family: 'Courier New', monospace;
             text-shadow: 0 0 15px var(--mc-blue);
             letter-spacing: 4px;
-            opacity: 0.1; /* Off par défaut */
+            opacity: 0.1;
             transition: opacity 0.5s ease;
         }
 
-        #txt-top { font-size: 32px; margin-bottom: 10px; }
-        #txt-bottom { font-size: 48px; font-weight: bold; }
+        #txt-top { font-size: 32px; margin-bottom: 5px; }
+        #txt-bottom { font-size: 44px; font-weight: bold; }
 
-        /* Section Boutons Agrandie */
         .knob-section {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 40px 120px;
-            margin-top: auto;
+            align-items: flex-end;
+            height: 220px;
+            padding-bottom: 20px;
         }
 
         .knob-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            width: 250px;
         }
 
-        .label-green {
-            color: var(--mc-green);
-            font-size: 18px; /* Labels plus lisibles */
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* Potentiomètres XXL */
         .knob-outer {
-            width: 140px; /* Presque doublé */
-            height: 140px;
-            background: conic-gradient(
-                from 0deg,
-                #222, #444, #222, #666, #222, #444, #222
-            );
+            width: 155px;
+            height: 155px;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 45%, #666 55%, #ffffff 100%);
             border-radius: 50%;
             padding: 8px;
-            box-shadow: 
-                0 20px 40px rgba(0,0,0,0.7),
-                inset 0 2px 4px rgba(255,255,255,0.2);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.6);
             cursor: pointer;
-            position: relative;
-            transition: transform 0.1s linear;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease;
+            margin-top: 15px;
         }
 
         .knob-inner {
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 30% 30%, #333, #000);
+            background: radial-gradient(circle, #333 0%, #000 75%),
+                        conic-gradient(from 0deg, #111, #222, #111, #222, #111);
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            position: relative;
-            box-shadow: inset 0 4px 10px rgba(255,255,255,0.1);
+            box-shadow: inset 0 2px 8px rgba(255,255,255,0.15);
         }
 
-        .knob-indicator {
-            position: absolute;
-            top: 15px;
-            width: 8px;
-            height: 8px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #fff;
-        }
-
-        /* Bouton Power XXL */
-        .power-btn-container {
+        .label-green {
+            color: var(--mc-green);
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             text-align: center;
-            margin-bottom: -10px;
+        }
+
+        /* POWER SECTION STYLES */
+        .power-btn-container { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 150px;
+            gap: 8px;
+        }
+
+        .power-led {
+            width: 10px;
+            height: 10px;
+            background: #400000; 
+            border-radius: 50%;
+            border: 1px solid #000;
+            transition: all 0.3s;
+        }
+
+        .power-led.active-red {
+            background: #ff0000;
+            box-shadow: 0 0 10px #ff0000;
         }
 
         .power-btn {
-            width: 80px;
-            height: 50px;
+            width: 45px; /* Taille réduite */
+            height: 28px; /* Taille réduite */
             background: linear-gradient(to bottom, #8a0000, #4a0000);
-            border: 3px solid #222;
-            border-radius: 10px;
+            border: 2px solid #222; border-radius: 6px;
             cursor: pointer;
-            box-shadow: 0 8px 0 #111, 0 12px 20px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 0 #111, 0 8px 12px rgba(0,0,0,0.6);
             transition: all 0.1s;
         }
-
         .power-btn.active {
             background: linear-gradient(to bottom, #ff0000, #a00000);
-            box-shadow: 0 4px 0 #111, 0 0 25px rgba(255,0,0,0.5);
-            transform: translateY(4px);
+            box-shadow: 0 2px 0 #111, 0 0 15px rgba(255,0,0,0.5);
+            transform: translateY(2px);
         }
 
-        /* Prise Jack Agrandie */
-        .jack-port {
-            width: 70px;
-            height: 70px;
-            background: radial-gradient(circle, #888, #222 75%);
-            border: 5px solid #111;
-            border-radius: 50%;
-            box-shadow: inset 0 4px 10px #000;
+        .small-label {
+            color: #555;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
     </style>
 </head>
 <body>
@@ -231,50 +215,46 @@
 
     <div class="meter-container">
         <div class="meter">
+            <div class="meter-scale"></div>
             <div class="needle" id="needle-l"></div>
         </div>
         
         <div class="brand-center">
-            <div class="brand-logo">McIntosh</div>
-            <div class="model-info">MSA5500 STREAMING<br>INTEGRATED AMPLIFIER</div>
+            <img src="img/mc-logo.png" alt="McIntosh" class="brand-logo-img">
         </div>
 
         <div class="meter">
+            <div class="meter-scale"></div>
             <div class="needle" id="needle-r"></div>
         </div>
     </div>
 
-    <div class="matrix-display" id="main-vfd">
-        <div id="txt-top">NETWORK 50%</div>
-        <div id="txt-bottom">Tidal HiFi</div>
+    <div class="display-area">
+        <div class="matrix-display" id="main-vfd">
+            <div id="txt-top">NETWORK 50%</div>
+            <div id="txt-bottom">Tidal HiFi</div>
+        </div>
     </div>
 
     <div class="knob-section">
         <div class="knob-wrapper">
-            <span class="label-green">Input Selection</span>
+            <span class="label-green">INPUT</span>
             <div class="knob-outer" id="knob-input">
-                <div class="knob-inner">
-                    <div class="knob-indicator"></div>
-                </div>
+                <div class="knob-inner"></div>
             </div>
         </div>
 
-        <div class="knob-wrapper">
-            <span class="label-green">Phones</span>
-            <div class="jack-port"></div>
-        </div>
-
         <div class="power-btn-container">
+            <span class="small-label">STANDBY/ON</span>
+            <div class="power-led active-red" id="pwr-led"></div>
             <div class="power-btn" id="pwr"></div>
-            <div class="label-green" style="color:#555; font-size: 14px; margin-top: 15px;">Standby / On</div>
+            <span class="small-label">RESET</span>
         </div>
 
         <div class="knob-wrapper">
-            <span class="label-green">Master Volume</span>
+            <span class="label-green">VOLUME</span>
             <div class="knob-outer" id="knob-vol">
-                <div class="knob-inner">
-                    <div class="knob-indicator"></div>
-                </div>
+                <div class="knob-inner"></div>
             </div>
         </div>
     </div>
@@ -282,6 +262,7 @@
 
 <script>
     const pwr = document.getElementById('pwr');
+    const pwrLed = document.getElementById('pwr-led');
     const volKnob = document.getElementById('knob-vol');
     const inputKnob = document.getElementById('knob-input');
     const needleL = document.getElementById('needle-l');
@@ -292,37 +273,38 @@
     let volRotation = 0;
     let inputRotation = 0;
 
-    // Toggle Power
     pwr.addEventListener('click', () => {
         isOn = !isOn;
         pwr.classList.toggle('active');
         vfd.style.opacity = isOn ? "1" : "0.1";
+        
+        if (isOn) {
+            pwrLed.classList.remove('active-red');
+        } else {
+            pwrLed.classList.add('active-red');
+        }
     });
 
-    // Interaction Potentiomètres
     volKnob.addEventListener('click', () => {
         if(!isOn) return;
-        volRotation += 20;
+        volRotation += 15;
         volKnob.style.transform = `rotate(${volRotation}deg)`;
     });
 
     inputKnob.addEventListener('click', () => {
         if(!isOn) return;
-        inputRotation += 45;
+        inputRotation += 30;
         inputKnob.style.transform = `rotate(${inputRotation}deg)`;
     });
 
-    // Animation des aiguilles (Plus amples sur grand format)
     function animateMeters() {
         if (!isOn) {
-            // Position de repos
             needleL.style.transform = 'rotate(-50deg)';
             needleR.style.transform = 'rotate(-50deg)';
         } else {
-            // Simulation de signal audio
-            const base = -10; 
-            const jitterL = base + (Math.random() * 50);
-            const jitterR = base + (Math.random() * 50);
+            const base = -15; 
+            const jitterL = base + (Math.random() * 45);
+            const jitterR = base + (Math.random() * 45);
             needleL.style.transform = `rotate(${jitterL}deg)`;
             needleR.style.transform = `rotate(${jitterR}deg)`;
         }
