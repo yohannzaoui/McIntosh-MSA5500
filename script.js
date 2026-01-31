@@ -181,13 +181,10 @@ stopBtn.addEventListener('click', () => {
     updateStatusIcon('stop');
 });
 
-// --- MUTE (Modifié : plus de changement d'apparence du bouton) ---
 muteBtn.addEventListener('click', () => {
     if (!isPoweredOn) return;
     isMuted = !isMuted;
     audio.muted = isMuted;
-    
-    // Affichage immédiat du statut "MUTE" ou du volume sur le VFD
     showVolumeBriefly(true); 
 });
 
@@ -212,9 +209,11 @@ audio.addEventListener('timeupdate', () => {
     }
 });
 
-// --- CONTROLE VOLUME ---
-let currentVolume = 0.7;
+// --- CONTROLE VOLUME (Initialisé à 5%) ---
+let currentVolume = 0.05;
 audio.volume = currentVolume;
+// On applique la rotation initiale pour 5%
+volumeKnob.style.transform = `rotate(${currentVolume * 270 - 135}deg)`;
 
 function updateVolumeDisplay() {
     audio.volume = currentVolume;
