@@ -2,7 +2,6 @@
 const nl = document.getElementById('needle-l');
 const nr = document.getElementById('needle-r');
 const vfdLarge = document.querySelector('.vfd-large');
-const vfdSmall = document.querySelector('.vfd-small');
 const vfdInfo = document.querySelector('.vfd-info');
 const trackCount = document.getElementById('track-count');
 const fileFormat = document.getElementById('file-format');
@@ -42,11 +41,9 @@ pwr.addEventListener('click', () => {
     if (!isPoweredOn) {
         audio.pause();
         audio.currentTime = 0;
-        vfdSmall.textContent = "STANDBY MODE";
         vfdLarge.textContent = "SYSTEM OFF";
         vfdInfo.textContent = "";
     } else {
-        vfdSmall.textContent = "READY TO CONNECT";
         vfdLarge.textContent = "SELECT INPUT";
         if (playlist.length > 0) {
             loadTrack(currentIndex);
@@ -60,11 +57,10 @@ function initEngine() {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioCtx.createAnalyser();
         
-        // Configuration ultra-réactive
-        analyser.fftSize = 1024; // Plus de détails fréquentiels
-        analyser.smoothingTimeConstant = 0.3; // Moins de lissage = plus réactif
-        analyser.minDecibels = -85; // Seuil plus bas pour capter plus de nuances
-        analyser.maxDecibels = -15; // Seuil plus haut pour éviter saturation
+        analyser.fftSize = 1024;
+        analyser.smoothingTimeConstant = 0.3;
+        analyser.minDecibels = -85;
+        analyser.maxDecibels = -15;
         
         dataArray = new Uint8Array(analyser.frequencyBinCount);
         source = audioCtx.createMediaElementSource(audio);
@@ -84,7 +80,6 @@ function loadTrack(index) {
     // Reset interface
     trackCount.textContent = `${currentIndex + 1}/${playlist.length}`;
     fileFormat.textContent = file.name.split('.').pop().toUpperCase();
-    vfdSmall.textContent = "NOW PLAYING";
 
     // Chargement propre
     const url = URL.createObjectURL(file);
@@ -121,12 +116,10 @@ inputBtn.addEventListener('click', () => {
 
 fileUpload.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
-        // Auto power on si eteint
         if (!isPoweredOn) {
             isPoweredOn = true;
             powerLed.classList.add('active');
         }
-        
         playlist = Array.from(e.target.files);
         loadTrack(0);
     }
@@ -165,20 +158,18 @@ muteBtn.addEventListener('click', () => {
     muteBtn.style.opacity = isMuted ? '0.5' : '1';
 });
 
-// Controle volume avec molette
+// Controle volume
 let currentVolume = 0.7;
 audio.volume = currentVolume;
 
 volumeKnob.addEventListener('wheel', (e) => {
     if (!isPoweredOn) return;
     e.preventDefault();
-    
     if (e.deltaY < 0) {
         currentVolume = Math.min(1, currentVolume + 0.05);
     } else {
         currentVolume = Math.max(0, currentVolume - 0.05);
     }
-    
     audio.volume = currentVolume;
     volumeKnob.style.transform = `rotate(${currentVolume * 270 - 135}deg)`;
 });
@@ -187,95 +178,42 @@ audio.onended = () => {
     if (currentIndex < playlist.length - 1) loadTrack(currentIndex + 1);
 };
 
-// --- ANIMATION VU METRES (ULTRA REACTIF) ---
+// --- ANIMATION VU METRES ---
 function animate() {
     requestAnimationFrame(animate);
     
     if (analyser && !audio.paused && isPoweredOn) {
         analyser.getByteFrequencyData(dataArray);
         
-        // Analyse large spectre pour plus de reactivite
-        let bassL = 0;
-        let midL = 0;
-        let highL = 0;
+        let bassL = 0, midL = 0, highL = 0;
+        for (let i = 0; i < 8; i++) bassL += dataArray[i];
+        for (let i = 8; i < 25; i++) midL += dataArray[i];
+        for (let i = 25; i < 40; i++) highL += dataArray[i];
         
-        // Basses profondes (0-8 bins) - kick, sub-bass
-        for (let i = 0; i < 8; i++) {
-            bassL += dataArray[i];
-        }
+        bassL /= 8; midL /= 17; highL /= 15;
+        let levelL = (bassL * 0.5 + midL * 0.35 + highL * 0.15) * 1.8;
+        let levelR = levelL * (0.92 + Math.random() * 0.16);
         
-        // Mediums (8-25 bins) - voix, instruments
-        for (let i = 8; i < 25; i++) {
-            midL += dataArray[i];
-        }
-        
-        // Aigus (25-40 bins) - cymbales, hi-hat
-        for (let i = 25; i < 40; i++) {
-            highL += dataArray[i];
-        }
-        
-        // Moyennes
-        bassL = bassL / 8;
-        midL = midL / 17;
-        highL = highL / 15;
-        
-        // Mix pondéré optimisé: priorité basses mais avec dynamique complète
-        let levelL = (bassL * 0.5 + midL * 0.35 + highL * 0.15);
-        
-        // Simulation stéréo avec variation réaliste
-        let levelR = levelL * (0.92 + Math.random() * 0.16); // 92% à 108%
-        
-        // BOOST de sensibilité (multiplicateur)
-        levelL = levelL * 1.8;
-        levelR = levelR * 1.8;
-        
-        // Mapping vers angles avec courbe exponentielle pour plus de punch
-        // Utilisation d'une courbe pour accentuer les variations
-        let normalizedL = Math.min(255, levelL) / 255;
-        let normalizedR = Math.min(255, levelR) / 255;
-        
-        // Courbe exponentielle pour meilleure réactivité visuelle
-        normalizedL = Math.pow(normalizedL, 0.7); // Exposant < 1 = plus de mouvement
-        normalizedR = Math.pow(normalizedR, 0.7);
+        let normalizedL = Math.pow(Math.min(255, levelL) / 255, 0.7);
+        let normalizedR = Math.pow(Math.min(255, levelR) / 255, 0.7);
         
         targetAngleL = -55 + normalizedL * 95;
         targetAngleR = -55 + normalizedR * 95;
         
-        // Limitation sécurisée
         targetAngleL = Math.max(-55, Math.min(40, targetAngleL));
         targetAngleR = Math.max(-55, Math.min(40, targetAngleR));
         
-        // Attack/Release ULTRA rapide
-        let attackSpeed = 0.75;   // Montée très rapide
-        let releaseSpeed = 0.25;  // Descente modérée
+        let attackSpeed = 0.75, releaseSpeed = 0.25;
+        currentAngleL += (targetAngleL > currentAngleL) ? (targetAngleL - currentAngleL) * attackSpeed : (targetAngleL - currentAngleL) * releaseSpeed;
+        currentAngleR += (targetAngleR > currentAngleR) ? (targetAngleR - currentAngleR) * attackSpeed : (targetAngleR - currentAngleR) * releaseSpeed;
         
-        if (targetAngleL > currentAngleL) {
-            currentAngleL += (targetAngleL - currentAngleL) * attackSpeed;
-        } else {
-            currentAngleL += (targetAngleL - currentAngleL) * releaseSpeed;
-        }
-        
-        if (targetAngleR > currentAngleR) {
-            currentAngleR += (targetAngleR - currentAngleR) * attackSpeed;
-        } else {
-            currentAngleR += (targetAngleR - currentAngleR) * releaseSpeed;
-        }
-        
-        // Jitter plus prononcé pour effet vintage
-        const jitterL = (Math.random() - 0.5) * 1.2;
-        const jitterR = (Math.random() - 0.5) * 1.2;
-        
-        nl.style.transform = `rotate(${currentAngleL + jitterL}deg)`;
-        nr.style.transform = `rotate(${currentAngleR + jitterR}deg)`;
-        
+        nl.style.transform = `rotate(${currentAngleL + (Math.random() - 0.5) * 1.2}deg)`;
+        nr.style.transform = `rotate(${currentAngleR + (Math.random() - 0.5) * 1.2}deg)`;
     } else {
-        // Retour progressif au repos
         currentAngleL += (-55 - currentAngleL) * 0.1;
         currentAngleR += (-55 - currentAngleR) * 0.1;
-        
         nl.style.transform = `rotate(${currentAngleL}deg)`;
         nr.style.transform = `rotate(${currentAngleR}deg)`;
     }
 }
-
 animate();
