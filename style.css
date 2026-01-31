@@ -17,7 +17,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: roboto, sans-serif;
     overflow: hidden;
 }
 
@@ -102,20 +102,20 @@ body {
     width: 850px; 
     height: 240px;
     background: #020202; 
-    border: 2px solid #1a1a1a;
+    border: 3px solid #1a1a1a;
     display: flex; 
     flex-direction: column; 
     justify-content: center; 
     align-items: center;
     color: var(--mc-blue); 
-    font-family: 'Courier New', monospace;
+    font-family: roboto ;
     text-shadow: 0 0 15px var(--mc-blue); 
     letter-spacing: 4px;
     position: relative;
     opacity: 1; 
 }
 
-/* --- COIN TECHNIQUE MISE Ã€ JOUR --- */
+/* --- COIN TECHNIQUE MISE À JOUR --- */
 .vfd-tech-corner {
     position: absolute;
     top: 15px;
@@ -145,7 +145,7 @@ body {
     color: var(--mc-led-green); 
     font-size: 20px; 
     font-weight: 700; /* Roboto Bold */
-    font-family: 'Roboto', sans-serif; /* Retour Ã  Roboto */
+    font-family: 'Roboto', sans-serif; /* Retour à Roboto */
     text-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
 }
 
@@ -164,7 +164,7 @@ body {
 .vfd-small { 
     font-size: 18px; 
     margin-bottom: 5px; 
-    font-family: 'Courier New', monospace;
+    font-family: roboto, sans-serif;
 }
 
 .vfd-large { 
@@ -187,7 +187,7 @@ body {
     text-transform: uppercase;
 }
 
-/* --- PARAMÃˆTRES MÃ‰MORISÃ‰S --- */
+/* --- PARAMÈTRES MÉMORISÉS --- */
 .knob-section {
     display: flex;
     justify-content: space-between;
@@ -262,6 +262,7 @@ body {
     font-weight: bold; 
     text-transform: uppercase; 
     text-align: center; 
+    font-family: 'Roboto', sans-serif;
 }
 
 .small-label i { font-size: 14px; color: var(--mc-green); }
@@ -367,18 +368,10 @@ body {
     z-index: 10;
 }
 
-/* Animation pour la pause (rappel si besoin) */
-.blink-soft {
-    animation: blinker 1.5s linear infinite;
-}
-@keyframes blinker {
-    50% { opacity: 0.3; }
-}
-
 /* Style spécifique pour l'état MUTE sur le VFD */
 .mute-active {
     opacity: 1 !important;
-    color: var(--mc-green); /* Optionnel : tu peux le mettre en rouge ou garder var(--mc-led-green) */
+    color: var(--mc-green);
 }
 
 .power-led {
@@ -388,7 +381,7 @@ body {
     background-color: #ff0000; /* Toujours rouge */
     box-shadow: 0 0 8px #ff0000; /* Toujours brillante */
     margin-bottom: 5px;
-    transition: none; /* Plus besoin de transition */
+    transition: none; 
 }
 
 /* Popup Pochette */
@@ -417,3 +410,77 @@ body {
     z-index: 999;
 }
 .vfd-large { cursor: pointer; }
+
+
+/* Le conteneur du VU-mètre */
+.dial {
+    position: relative;
+    width: 100%;
+    height: 140px; 
+    background-image: url('TON_URL_IMAGE_ICI'); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    border: none; 
+    overflow: hidden;
+}
+
+.meter {
+    position: relative;
+    width: 100%; 
+    height: 280px; 
+    background-image: url(img/vu-meter-2.png); 
+    background-size: 80% auto; 
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-color: transparent; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.options-menu {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    background: #000000;
+    border: 2px solid #ce9e48;
+    padding: 20px;
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    transform: translate(95%, calc(-50% + 100px));
+}
+
+.options-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.gold-divider {
+    width: 100%;
+    height: 1px;
+    background: #ce9e48; 
+    margin: 15px 0;
+}
+
+/* --- AJOUT INDICATEUR VFD RANDOM/REPEAT --- */
+#vfd-mode-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 15px;
+    color: var(--mc-led-green, #00ff66);
+    font-size: 11px;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0,255,102,0.5);
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    gap: 15px;
+    pointer-events: none;
+    text-transform: uppercase;
+}

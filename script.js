@@ -48,6 +48,11 @@ let currentAngleL = -55;
 let currentAngleR = -55;
 let targetAngleL = -55;
 let targetAngleR = -55;
+let isRandom = false;
+let repeatMode = 0; // 0: OFF, 1: REPEAT 1, 2: REPEAT ALL
+
+// --- VARIABLES VOLUME CONTINU ---
+let volHoldInterval = null;
 
 // --- INITIALISATION VOLUME PAR DÉFAUT ---
 let currentVolume = 0.05;
@@ -84,12 +89,31 @@ function updateStatusIcon(state) {
     }
 }
 
+// --- MISE À JOUR VFD (RANDOM/REPEAT) ---
+function updateVFDStatusDisplay() {
+    let modeIndicator = document.getElementById('vfd-mode-indicator');
+    if (!modeIndicator) {
+        modeIndicator = document.createElement('div');
+        modeIndicator.id = 'vfd-mode-indicator';
+        modeIndicator.style.cssText = "position: absolute; bottom: 8px; left: 15px; color: var(--mc-led-green, #00ff66); font-size: 11px; font-weight: bold; text-shadow: 0 0 5px rgba(0,255,102,0.5); display: flex; gap: 10px;";
+        document.getElementById('vfd').appendChild(modeIndicator);
+    }
+    
+    let repeatText = "";
+    if (repeatMode === 1) repeatText = "REPEAT 1";
+    else if (repeatMode === 2) repeatText = "REPEAT ALL";
+    
+    modeIndicator.innerHTML = `
+        <span>${isRandom ? "RANDOM" : ""}</span>
+        <span>${repeatText}</span>
+    `;
+}
+
 // --- POWER ON/OFF / REINITIALISATION ---
 pwr.addEventListener('click', () => {
     isPoweredOn = !isPoweredOn;
     
     if (!isPoweredOn) {
-        // --- RÉINITIALISATION COMPLÈTE ---
         audio.pause();
         audio.src = ""; 
         fileUpload.value = ""; 
@@ -97,13 +121,13 @@ pwr.addEventListener('click', () => {
         currentIndex = 0;
         isMuted = false;
         audio.muted = false;
+        isRandom = false;
+        repeatMode = 0;
         
-        // Reset Volume par défaut (5%)
         currentVolume = 0.05;
         audio.volume = currentVolume;
         volumeKnob.style.transform = `rotate(${currentVolume * 270 - 135}deg)`;
         
-        // Reset VFD
         vfdLarge.textContent = "SYSTEM OFF";
         vfdInfo.textContent = "";
         statusIcon.innerHTML = "";
@@ -112,14 +136,15 @@ pwr.addEventListener('click', () => {
         bitrateDisplay.textContent = "0 KBPS";
         if(volDisplay) volDisplay.style.opacity = "0";
         if(timeDisplay) timeDisplay.textContent = "00:00";
+        const modeIndicator = document.getElementById('vfd-mode-indicator');
+        if(modeIndicator) modeIndicator.textContent = "";
         
-        // Reset Needles
         targetAngleL = -55;
         targetAngleR = -55;
 
-        // Fermer popup si ouvert
         if(albumOverlay) albumOverlay.style.display = 'none';
         if(albumPopup) albumPopup.style.display = 'none';
+        if(optionsPopup) optionsPopup.style.display = 'none';
     } else {
         vfdLarge.textContent = "SELECT INPUT";
         updateStatusIcon('stop');
@@ -193,8 +218,16 @@ function stopSeeking(direction) {
     clearInterval(seekInterval);
     if (isPoweredOn && playlist.length > 0) {
         if (!isSeeking) {
-            if (direction === 'next' && currentIndex < playlist.length - 1) {
-                loadTrack(currentIndex + 1);
+            if (direction === 'next') {
+                if (isRandom && playlist.length > 1) {
+                    let nextIndex;
+                    do { nextIndex = Math.floor(Math.random() * playlist.length); } while (nextIndex === currentIndex);
+                    loadTrack(nextIndex);
+                } else if (currentIndex < playlist.length - 1) {
+                    loadTrack(currentIndex + 1);
+                } else if (repeatMode === 2) {
+                    loadTrack(0);
+                }
             } else if (direction === 'prev' && currentIndex > 0) {
                 loadTrack(currentIndex - 1);
             }
@@ -240,6 +273,24 @@ muteBtn.addEventListener('click', () => {
     isMuted = !isMuted; audio.muted = isMuted; showVolumeBriefly(true); 
 });
 
+const randomBtn = document.getElementById('random-btn');
+if (randomBtn) {
+    randomBtn.addEventListener('click', () => {
+        if (!isPoweredOn) return;
+        isRandom = !isRandom;
+        updateVFDStatusDisplay();
+    });
+}
+
+const repeatBtn = document.getElementById('repeat-btn');
+if (repeatBtn) {
+    repeatBtn.addEventListener('click', () => {
+        if (!isPoweredOn) return;
+        repeatMode = (repeatMode + 1) % 3;
+        updateVFDStatusDisplay();
+    });
+}
+
 if (timeDisplay) {
     timeDisplay.style.cursor = "pointer";
     timeDisplay.addEventListener('click', () => { isShowingRemaining = !isShowingRemaining; });
@@ -261,7 +312,6 @@ audio.addEventListener('timeupdate', () => {
     }
 });
 
-// --- POPUP POCHTETTE ---
 if (albumOverlay) {
     albumOverlay.addEventListener('click', () => {
         albumOverlay.style.display = 'none';
@@ -271,7 +321,6 @@ if (albumOverlay) {
 
 vfdLarge.addEventListener('click', () => {
     if (!isPoweredOn || playlist.length === 0) return;
-    
     const file = playlist[currentIndex];
     if (window.jsmediatags) {
         window.jsmediatags.read(file, {
@@ -298,12 +347,27 @@ function updateVolumeDisplay() {
     showVolumeBriefly();
 }
 
-volumeKnob.addEventListener('click', (e) => {
+// --- LOGIQUE VOLUME : CLIC SIMPLE ET MAINTENU ---
+volumeKnob.addEventListener('mousedown', (e) => {
     if (!isPoweredOn) return;
     const rect = volumeKnob.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    currentVolume = (x < rect.width / 2) ? Math.max(0, currentVolume - 0.05) : Math.min(1, currentVolume + 0.05);
+    const isRightSide = x > rect.width / 2;
+
+    // Clic immédiat
+    currentVolume = isRightSide ? Math.min(1, currentVolume + 0.01) : Math.max(0, currentVolume - 0.01);
     updateVolumeDisplay();
+
+    // Démarrage du maintien après un court délai
+    clearInterval(volHoldInterval);
+    volHoldInterval = setInterval(() => {
+        currentVolume = isRightSide ? Math.min(1, currentVolume + 0.01) : Math.max(0, currentVolume - 0.01);
+        updateVolumeDisplay();
+    }, 50); // Vitesse de montée/descente
+});
+
+window.addEventListener('mouseup', () => {
+    clearInterval(volHoldInterval);
 });
 
 volumeKnob.addEventListener('mouseenter', showVolumeBriefly);
@@ -315,8 +379,20 @@ volumeKnob.addEventListener('wheel', (e) => {
 });
 
 audio.onended = () => {
-    if (currentIndex < playlist.length - 1) loadTrack(currentIndex + 1);
-    else updateStatusIcon('stop');
+    if (!isPoweredOn) return;
+    if (repeatMode === 1) {
+        loadTrack(currentIndex);
+    } else if (isRandom && playlist.length > 1) {
+        let nextIndex;
+        do { nextIndex = Math.floor(Math.random() * playlist.length); } while (nextIndex === currentIndex);
+        loadTrack(nextIndex);
+    } else if (currentIndex < playlist.length - 1) {
+        loadTrack(currentIndex + 1);
+    } else if (repeatMode === 2) {
+        loadTrack(0);
+    } else {
+        updateStatusIcon('stop');
+    }
 };
 
 function animate() {
@@ -349,3 +425,26 @@ function animate() {
     }
 }
 animate();
+
+const optionsPopup = document.getElementById('options-popup');
+const optionsToggleBtn = document.getElementById('options-toggle-btn');
+const btnOpt = document.getElementById('btn-options-trigger');
+
+function toggleOptions(e) {
+    if (!isPoweredOn) return;
+    e.stopPropagation();
+    const isVisible = optionsPopup.style.display === 'block';
+    optionsPopup.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) optionsPopup.style.zIndex = "9999";
+}
+
+if (optionsToggleBtn) optionsToggleBtn.addEventListener('click', toggleOptions);
+if (btnOpt) btnOpt.addEventListener('click', toggleOptions);
+
+document.addEventListener('click', (e) => {
+    if (optionsPopup && optionsPopup.style.display === 'block') {
+        if (!optionsPopup.contains(e.target) && e.target !== optionsToggleBtn && e.target !== btnOpt) {
+            optionsPopup.style.display = 'none';
+        }
+    }
+});
