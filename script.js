@@ -21,6 +21,11 @@ const pwr = document.getElementById('pwr');
 const powerLed = document.querySelector('.power-led');
 const audio = document.getElementById('main-audio');
 
+// --- SELECTEURS POPUP ---
+const albumOverlay = document.getElementById('album-overlay');
+const albumPopup = document.getElementById('album-popup');
+const popupImg = document.getElementById('popup-img');
+
 // --- VARIABLES ---
 let playlist = [];
 let currentIndex = 0;
@@ -80,16 +85,14 @@ function updateStatusIcon(state) {
 }
 
 // --- POWER ON/OFF / REINITIALISATION ---
-// --- POWER ON/OFF / REINITIALISATION ---
 pwr.addEventListener('click', () => {
     isPoweredOn = !isPoweredOn;
-    // La LED est maintenant gérée par le CSS (toujours allumée)
     
     if (!isPoweredOn) {
         // --- RÉINITIALISATION COMPLÈTE ---
         audio.pause();
         audio.src = ""; 
-        fileUpload.value = ""; // CRUCIAL : permet de recharger les fichiers après reset
+        fileUpload.value = ""; 
         playlist = [];
         currentIndex = 0;
         isMuted = false;
@@ -113,6 +116,10 @@ pwr.addEventListener('click', () => {
         // Reset Needles
         targetAngleL = -55;
         targetAngleR = -55;
+
+        // Fermer popup si ouvert
+        if(albumOverlay) albumOverlay.style.display = 'none';
+        if(albumPopup) albumPopup.style.display = 'none';
     } else {
         vfdLarge.textContent = "SELECT INPUT";
         updateStatusIcon('stop');
@@ -251,6 +258,37 @@ audio.addEventListener('timeupdate', () => {
         const mins = Math.floor(displaySeconds / 60).toString().padStart(2, '0');
         const secs = Math.floor(displaySeconds % 60).toString().padStart(2, '0');
         timeDisplay.textContent = `${prefix}${mins}:${secs}`;
+    }
+});
+
+// --- POPUP POCHTETTE ---
+if (albumOverlay) {
+    albumOverlay.addEventListener('click', () => {
+        albumOverlay.style.display = 'none';
+        albumPopup.style.display = 'none';
+    });
+}
+
+vfdLarge.addEventListener('click', () => {
+    if (!isPoweredOn || playlist.length === 0) return;
+    
+    const file = playlist[currentIndex];
+    if (window.jsmediatags) {
+        window.jsmediatags.read(file, {
+            onSuccess: (tag) => {
+                const image = tag.tags.picture;
+                if (image) {
+                    let base64String = "";
+                    for (let i = 0; i < image.data.length; i++) {
+                        base64String += String.fromCharCode(image.data[i]);
+                    }
+                    popupImg.src = `data:${image.format};base64,${window.btoa(base64String)}`;
+                    albumOverlay.style.display = 'block';
+                    albumPopup.style.display = 'block';
+                }
+            },
+            onError: (error) => console.log(error)
+        });
     }
 });
 
