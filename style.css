@@ -484,3 +484,66 @@ body {
     pointer-events: none;
     text-transform: uppercase;
 }
+
+
+/* --- MODE STEALTH (NOIR TOTAL) --- */
+/* Éteint le texte du VFD */
+.matrix-display.vfd-off {
+    opacity: 0 !important;
+    transition: opacity 0.4s ease;
+}
+
+/* Éteint le fond bleu et les graduations des VU-mètres */
+.meter-container.stealth-mode {
+    filter: brightness(0);
+    opacity: 0.1; /* On laisse une infime trace ou 0 pour le noir complet */
+    transition: all 0.4s ease;
+}
+
+/* Optionnel : si tu veux aussi figer les aiguilles en bas quand c'est éteint */
+.meter-container.stealth-mode .needle {
+    display: none;
+}
+
+/* Style pour les items de la playlist */
+.playlist-item {
+    padding: 10px;
+    border-bottom: 1px solid #222;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+}
+
+.playlist-item:hover {
+    background: #1a1a1a;
+    color: var(--mc-green);
+}
+
+.playlist-item.active-track {
+    color: var(--mc-green);
+    font-weight: bold;
+}
+
+/* Scrollbar personnalisée pour rester dans le style */
+#playlist-popup::-webkit-scrollbar {
+    width: 5px;
+}
+#playlist-popup::-webkit-scrollbar-thumb {
+    background: var(--mc-blue);
+}
+
+#playlist-popup {
+    display: none; /* Caché par défaut */
+    position: fixed;
+    top: 50%;         /* Position verticale (50% = centre) */
+    left: 20%;        /* Position horizontale (plus petit = plus à gauche) */
+    transform: translate(-50%, -50%); /* Pour que le centre de la popup soit au point choisi */
+    z-index: 10000;   /* Pour passer devant tout le reste */
+    
+    /* Tes réglages de style McIntosh */
+    background-color: #000;
+    border: 2px solid #555;
+    padding: 20px;
+}
