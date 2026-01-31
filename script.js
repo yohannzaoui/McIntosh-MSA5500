@@ -48,6 +48,7 @@ let currentAngleL = -55;
 let currentAngleR = -55;
 let targetAngleL = -55;
 let targetAngleR = -55;
+let isRandom = false;
 
 // --- INITIALISATION VOLUME PAR DÉFAUT ---
 let currentVolume = 0.05;
@@ -84,6 +85,19 @@ function updateStatusIcon(state) {
     }
 }
 
+// --- MISE À JOUR VFD (RANDOM/REPEAT) ---
+function updateVFDStatusDisplay() {
+    let modeIndicator = document.getElementById('vfd-mode-indicator');
+    if (!modeIndicator) {
+        modeIndicator = document.createElement('div');
+        modeIndicator.id = 'vfd-mode-indicator';
+        // Style pour le bas à gauche en vert
+        modeIndicator.style.cssText = "position: absolute; bottom: 8px; left: 15px; color: var(--mc-led-green, #00ff66); font-size: 11px; font-weight: bold; text-shadow: 0 0 5px rgba(0,255,102,0.5);";
+        document.getElementById('vfd').appendChild(modeIndicator);
+    }
+    modeIndicator.textContent = isRandom ? "RANDOM" : "";
+}
+
 // --- POWER ON/OFF / REINITIALISATION ---
 pwr.addEventListener('click', () => {
     isPoweredOn = !isPoweredOn;
@@ -97,6 +111,7 @@ pwr.addEventListener('click', () => {
         currentIndex = 0;
         isMuted = false;
         audio.muted = false;
+        isRandom = false;
         
         // Reset Volume par défaut (5%)
         currentVolume = 0.05;
@@ -112,6 +127,8 @@ pwr.addEventListener('click', () => {
         bitrateDisplay.textContent = "0 KBPS";
         if(volDisplay) volDisplay.style.opacity = "0";
         if(timeDisplay) timeDisplay.textContent = "00:00";
+        const modeIndicator = document.getElementById('vfd-mode-indicator');
+        if(modeIndicator) modeIndicator.textContent = "";
         
         // Reset Needles
         targetAngleL = -55;
@@ -120,6 +137,7 @@ pwr.addEventListener('click', () => {
         // Fermer popup si ouvert
         if(albumOverlay) albumOverlay.style.display = 'none';
         if(albumPopup) albumPopup.style.display = 'none';
+        if(optionsPopup) optionsPopup.style.display = 'none';
     } else {
         vfdLarge.textContent = "SELECT INPUT";
         updateStatusIcon('stop');
@@ -193,8 +211,15 @@ function stopSeeking(direction) {
     clearInterval(seekInterval);
     if (isPoweredOn && playlist.length > 0) {
         if (!isSeeking) {
-            if (direction === 'next' && currentIndex < playlist.length - 1) {
-                loadTrack(currentIndex + 1);
+            // AJOUT LOGIQUE RANDOM POUR BOUTON NEXT
+            if (direction === 'next') {
+                if (isRandom && playlist.length > 1) {
+                    let nextIndex;
+                    do { nextIndex = Math.floor(Math.random() * playlist.length); } while (nextIndex === currentIndex);
+                    loadTrack(nextIndex);
+                } else if (currentIndex < playlist.length - 1) {
+                    loadTrack(currentIndex + 1);
+                }
             } else if (direction === 'prev' && currentIndex > 0) {
                 loadTrack(currentIndex - 1);
             }
@@ -239,6 +264,16 @@ muteBtn.addEventListener('click', () => {
     if (!isPoweredOn) return;
     isMuted = !isMuted; audio.muted = isMuted; showVolumeBriefly(true); 
 });
+
+// Logique Bouton Random dans Popup
+const randomBtn = document.getElementById('random-btn');
+if (randomBtn) {
+    randomBtn.addEventListener('click', () => {
+        if (!isPoweredOn) return;
+        isRandom = !isRandom;
+        updateVFDStatusDisplay();
+    });
+}
 
 if (timeDisplay) {
     timeDisplay.style.cursor = "pointer";
@@ -314,9 +349,20 @@ volumeKnob.addEventListener('wheel', (e) => {
     updateVolumeDisplay();
 });
 
+// LOGIQUE FIN DE PISTE ALEATOIRE
 audio.onended = () => {
-    if (currentIndex < playlist.length - 1) loadTrack(currentIndex + 1);
-    else updateStatusIcon('stop');
+    if (!isPoweredOn) return;
+    if (isRandom && playlist.length > 1) {
+        let nextIndex;
+        do {
+            nextIndex = Math.floor(Math.random() * playlist.length);
+        } while (nextIndex === currentIndex);
+        loadTrack(nextIndex);
+    } else if (currentIndex < playlist.length - 1) {
+        loadTrack(currentIndex + 1);
+    } else {
+        updateStatusIcon('stop');
+    }
 };
 
 function animate() {
@@ -354,51 +400,23 @@ animate();
 // --- GESTION DU POPUP OPTIONS ---
 const optionsPopup = document.getElementById('options-popup');
 const optionsToggleBtn = document.getElementById('options-toggle-btn');
-
-if (optionsToggleBtn && optionsPopup) {
-    optionsToggleBtn.addEventListener('click', (e) => {
-        // Le bouton ne fonctionne que si l'appareil est allumé
-        if (!isPoweredOn) return;
-        
-        e.stopPropagation(); // Empêche la fermeture immédiate
-        const isVisible = optionsPopup.style.display === 'block';
-        optionsPopup.style.display = isVisible ? 'none' : 'block';
-    });
-}
-
-// Fermer la popup si on clique n'importe où ailleurs sur l'écran
-document.addEventListener('click', (e) => {
-    if (optionsPopup && optionsPopup.style.display === 'block') {
-        if (!optionsPopup.contains(e.target) && e.target !== optionsToggleBtn) {
-            optionsPopup.style.display = 'none';
-        }
-    }
-});
-
-
-// --- LOGIQUE D'OUVERTURE OPTIONS ---
-const pop = document.getElementById('options-popup');
 const btnOpt = document.getElementById('btn-options-trigger');
 
-if (btnOpt && pop) {
-    btnOpt.addEventListener('click', (e) => {
-        // On empêche le clic de se propager pour ne pas fermer la popup aussitôt
-        e.stopPropagation();
-        
-        // On bascule l'affichage
-        if (pop.style.display === 'block') {
-            pop.style.display = 'none';
-        } else {
-            pop.style.display = 'block';
-            // On s'assure qu'elle est bien au-dessus de tout
-            pop.style.zIndex = "9999"; 
-        }
-    });
+function toggleOptions(e) {
+    if (!isPoweredOn) return;
+    e.stopPropagation();
+    const isVisible = optionsPopup.style.display === 'block';
+    optionsPopup.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) optionsPopup.style.zIndex = "9999";
 }
 
-// Fermer la popup si on clique à côté
+if (optionsToggleBtn) optionsToggleBtn.addEventListener('click', toggleOptions);
+if (btnOpt) btnOpt.addEventListener('click', toggleOptions);
+
 document.addEventListener('click', (e) => {
-    if (pop && !pop.contains(e.target)) {
-        pop.style.display = 'none';
+    if (optionsPopup && optionsPopup.style.display === 'block') {
+        if (!optionsPopup.contains(e.target) && e.target !== optionsToggleBtn && e.target !== btnOpt) {
+            optionsPopup.style.display = 'none';
+        }
     }
 });
