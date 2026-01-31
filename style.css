@@ -169,11 +169,20 @@ body {
 
 .vfd-large { 
     font-family: 'Bitcount Single', sans-serif;
-    font-size: 38px; 
+    font-size: 30px; 
     font-weight: 300;
     text-transform: uppercase;
     margin-top: 50px;
     letter-spacing: 2px;
+    
+    /* --- AJOUTS POUR L'ADAPTATION DYNAMIQUE --- */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    text-align: center;
 }
 
 .vfd-info {
