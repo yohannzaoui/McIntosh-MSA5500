@@ -37,12 +37,17 @@ let volTimeout = null;
 let seekInterval = null;
 let isSeeking = false;
 let seekStartTime = 0;
-let isMouseDown = false; // Sécurité supplémentaire
+let isMouseDown = false;
 
 let currentAngleL = -55;
 let currentAngleR = -55;
 let targetAngleL = -55;
 let targetAngleR = -55;
+
+// --- INITIALISATION VOLUME PAR DÉFAUT ---
+let currentVolume = 0.05;
+audio.volume = currentVolume;
+volumeKnob.style.transform = `rotate(${currentVolume * 270 - 135}deg)`;
 
 // Fonction pour afficher le volume ou le MUTE
 function showVolumeBriefly(forceMuteDisplay = false) {
@@ -74,22 +79,43 @@ function updateStatusIcon(state) {
     }
 }
 
-// --- POWER ON/OFF ---
+// --- POWER ON/OFF / REINITIALISATION ---
+// --- POWER ON/OFF / REINITIALISATION ---
 pwr.addEventListener('click', () => {
     isPoweredOn = !isPoweredOn;
-    powerLed.classList.toggle('active', isPoweredOn);
+    // La LED est maintenant gérée par le CSS (toujours allumée)
+    
     if (!isPoweredOn) {
+        // --- RÉINITIALISATION COMPLÈTE ---
         audio.pause();
-        audio.currentTime = 0;
+        audio.src = ""; 
+        fileUpload.value = ""; // CRUCIAL : permet de recharger les fichiers après reset
+        playlist = [];
+        currentIndex = 0;
+        isMuted = false;
+        audio.muted = false;
+        
+        // Reset Volume par défaut (5%)
+        currentVolume = 0.05;
+        audio.volume = currentVolume;
+        volumeKnob.style.transform = `rotate(${currentVolume * 270 - 135}deg)`;
+        
+        // Reset VFD
         vfdLarge.textContent = "SYSTEM OFF";
         vfdInfo.textContent = "";
-        updateStatusIcon('off');
+        statusIcon.innerHTML = "";
+        trackCount.textContent = "0/0";
+        fileFormat.textContent = "---";
+        bitrateDisplay.textContent = "0 KBPS";
         if(volDisplay) volDisplay.style.opacity = "0";
         if(timeDisplay) timeDisplay.textContent = "00:00";
+        
+        // Reset Needles
+        targetAngleL = -55;
+        targetAngleR = -55;
     } else {
         vfdLarge.textContent = "SELECT INPUT";
         updateStatusIcon('stop');
-        if (playlist.length > 0) loadTrack(currentIndex);
     }
 });
 
@@ -156,12 +182,10 @@ function startSeeking(direction) {
 }
 
 function stopSeeking(direction) {
-    if (!isMouseDown) return; // Empêche le déclenchement au simple survol
-    
+    if (!isMouseDown) return;
     clearInterval(seekInterval);
     if (isPoweredOn && playlist.length > 0) {
         if (!isSeeking) {
-            // Simple clic : changement de piste
             if (direction === 'next' && currentIndex < playlist.length - 1) {
                 loadTrack(currentIndex + 1);
             } else if (direction === 'prev' && currentIndex > 0) {
@@ -191,12 +215,10 @@ playPauseBtn.addEventListener('click', () => {
     else { audio.pause(); updateStatusIcon('pause'); }
 });
 
-// Next Button corrigé
 nextBtn.addEventListener('mousedown', (e) => { if(e.button === 0) startSeeking('next'); });
 nextBtn.addEventListener('mouseup', () => stopSeeking('next'));
 nextBtn.addEventListener('mouseleave', () => { isMouseDown = false; clearInterval(seekInterval); });
 
-// Prev Button corrigé
 prevBtn.addEventListener('mousedown', (e) => { if(e.button === 0) startSeeking('prev'); });
 prevBtn.addEventListener('mouseup', () => stopSeeking('prev'));
 prevBtn.addEventListener('mouseleave', () => { isMouseDown = false; clearInterval(seekInterval); });
@@ -231,11 +253,6 @@ audio.addEventListener('timeupdate', () => {
         timeDisplay.textContent = `${prefix}${mins}:${secs}`;
     }
 });
-
-// --- CONTROLE VOLUME ---
-let currentVolume = 0.05;
-audio.volume = currentVolume;
-volumeKnob.style.transform = `rotate(${currentVolume * 270 - 135}deg)`;
 
 function updateVolumeDisplay() {
     audio.volume = currentVolume;

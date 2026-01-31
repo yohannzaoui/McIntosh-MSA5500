@@ -380,3 +380,13 @@ body {
     opacity: 1 !important;
     color: var(--mc-green); /* Optionnel : tu peux le mettre en rouge ou garder var(--mc-led-green) */
 }
+
+.power-led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ff0000; /* Toujours rouge */
+    box-shadow: 0 0 8px #ff0000; /* Toujours brillante */
+    margin-bottom: 5px;
+    transition: none; /* Plus besoin de transition */
+}
