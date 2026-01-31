@@ -163,7 +163,7 @@ body {
 
 .vfd-small { 
     font-size: 18px; 
-    margin-bottom: 10px; 
+    margin-bottom: 5px; 
     font-family: 'Courier New', monospace;
 }
 
@@ -172,7 +172,8 @@ body {
     font-size: 38px; 
     font-weight: 300;
     text-transform: uppercase;
-    margin-bottom: 8px;
+    
+    margin-top: 40px;
     letter-spacing: 2px;
 }
 
