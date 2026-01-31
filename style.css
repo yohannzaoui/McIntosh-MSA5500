@@ -329,7 +329,7 @@ body {
 .btn-base {
     background: linear-gradient(180deg, #1d1d1d, #050505);
     /* Ton cadre extérieur bombé de 5px */
-    border: 5px solid #1a1a1a; 
+    border: 5px solid #2c2c2c; 
     width: 65px;
     height: 45px;
     border-radius: 15px;
