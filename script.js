@@ -49,6 +49,7 @@ let currentAngleR = -55;
 let targetAngleL = -55;
 let targetAngleR = -55;
 let isRandom = false;
+let repeatMode = 0; // 0: OFF, 1: REPEAT 1, 2: REPEAT ALL
 
 // --- INITIALISATION VOLUME PAR DÉFAUT ---
 let currentVolume = 0.05;
@@ -91,11 +92,18 @@ function updateVFDStatusDisplay() {
     if (!modeIndicator) {
         modeIndicator = document.createElement('div');
         modeIndicator.id = 'vfd-mode-indicator';
-        // Style pour le bas à gauche en vert
-        modeIndicator.style.cssText = "position: absolute; bottom: 8px; left: 15px; color: var(--mc-led-green, #00ff66); font-size: 11px; font-weight: bold; text-shadow: 0 0 5px rgba(0,255,102,0.5);";
+        modeIndicator.style.cssText = "position: absolute; bottom: 8px; left: 15px; color: var(--mc-led-green, #00ff66); font-size: 11px; font-weight: bold; text-shadow: 0 0 5px rgba(0,255,102,0.5); display: flex; gap: 10px;";
         document.getElementById('vfd').appendChild(modeIndicator);
     }
-    modeIndicator.textContent = isRandom ? "RANDOM" : "";
+    
+    let repeatText = "";
+    if (repeatMode === 1) repeatText = "REPEAT 1";
+    else if (repeatMode === 2) repeatText = "REPEAT ALL";
+    
+    modeIndicator.innerHTML = `
+        <span>${isRandom ? "RANDOM" : ""}</span>
+        <span>${repeatText}</span>
+    `;
 }
 
 // --- POWER ON/OFF / REINITIALISATION ---
@@ -112,6 +120,7 @@ pwr.addEventListener('click', () => {
         isMuted = false;
         audio.muted = false;
         isRandom = false;
+        repeatMode = 0;
         
         // Reset Volume par défaut (5%)
         currentVolume = 0.05;
@@ -211,7 +220,6 @@ function stopSeeking(direction) {
     clearInterval(seekInterval);
     if (isPoweredOn && playlist.length > 0) {
         if (!isSeeking) {
-            // AJOUT LOGIQUE RANDOM POUR BOUTON NEXT
             if (direction === 'next') {
                 if (isRandom && playlist.length > 1) {
                     let nextIndex;
@@ -219,6 +227,8 @@ function stopSeeking(direction) {
                     loadTrack(nextIndex);
                 } else if (currentIndex < playlist.length - 1) {
                     loadTrack(currentIndex + 1);
+                } else if (repeatMode === 2) {
+                    loadTrack(0);
                 }
             } else if (direction === 'prev' && currentIndex > 0) {
                 loadTrack(currentIndex - 1);
@@ -271,6 +281,16 @@ if (randomBtn) {
     randomBtn.addEventListener('click', () => {
         if (!isPoweredOn) return;
         isRandom = !isRandom;
+        updateVFDStatusDisplay();
+    });
+}
+
+// Logique Bouton Repeat dans Popup
+const repeatBtn = document.getElementById('repeat-btn');
+if (repeatBtn) {
+    repeatBtn.addEventListener('click', () => {
+        if (!isPoweredOn) return;
+        repeatMode = (repeatMode + 1) % 3;
         updateVFDStatusDisplay();
     });
 }
@@ -349,17 +369,26 @@ volumeKnob.addEventListener('wheel', (e) => {
     updateVolumeDisplay();
 });
 
-// LOGIQUE FIN DE PISTE ALEATOIRE
+// LOGIQUE FIN DE PISTE (RANDOM ET REPEAT)
 audio.onended = () => {
     if (!isPoweredOn) return;
-    if (isRandom && playlist.length > 1) {
+
+    if (repeatMode === 1) {
+        // REPEAT 1 : Relit le même fichier
+        loadTrack(currentIndex);
+    } else if (isRandom && playlist.length > 1) {
+        // RANDOM
         let nextIndex;
         do {
             nextIndex = Math.floor(Math.random() * playlist.length);
         } while (nextIndex === currentIndex);
         loadTrack(nextIndex);
     } else if (currentIndex < playlist.length - 1) {
+        // SUIVANT NORMAL
         loadTrack(currentIndex + 1);
+    } else if (repeatMode === 2) {
+        // REPEAT ALL : Retour au début
+        loadTrack(0);
     } else {
         updateStatusIcon('stop');
     }
