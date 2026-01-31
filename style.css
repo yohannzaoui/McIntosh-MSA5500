@@ -93,7 +93,7 @@ body {
     bottom: -20px;
     left: 50%;
     width: 2px;
-    height: 275px;
+    height: 268px;
     background: #000;
     transform-origin: bottom center;
     transform: rotate(-55deg);
@@ -523,7 +523,7 @@ body {
     position: relative;
     width: 100%;
     height: 280px;
-    background-image: url(img/vu-meter-2.png);
+    background-image: url(img/vumeter-new.png);
     background-size: 80% auto;
     background-repeat: no-repeat;
     background-position: center bottom;
@@ -703,4 +703,22 @@ body {
     z-index: 20;
     pointer-events: none;
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+}
+
+#vfd-status-icon {
+    color: var(--mc-led-green);
+    /* Augmentation de la taille */
+    font-size: 45px; 
+    
+    /* Positionnement dans le coin bas droit */
+    position: absolute;
+    right: 20px;
+    bottom: 15px;
+    
+    /* On retire les marges automatiques qui pourraient gêner */
+    margin: 0;
+    height: auto;
+    
+    text-shadow: 0 0 12px rgba(0, 255, 0, 0.6);
+    z-index: 10;
 }
