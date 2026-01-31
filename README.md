@@ -6,7 +6,7 @@ A high-fidelity web-based audio player inspired by the iconic McIntosh amplifier
 ![Status](https://img.shields.io/badge/status-active-success)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-<img width="252" height="67" alt="logo" src="https://github.com/user-attachments/assets/08101d8d-dcd9-4c84-b22b-ec3ee6e06e8f" />
+<img width="1280" height="343" alt="McIntosh_Logo" src="https://github.com/user-attachments/assets/36ea3b5c-d932-4af0-a648-0a984e82c769" />
 <img width="1802" height="788" alt="1" src="https://github.com/user-attachments/assets/928f55b0-57ad-4dfd-9d0c-5feb815fc32e" />
 
 ## Features
