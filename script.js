@@ -33,6 +33,12 @@ let isMuted = false;
 let isShowingRemaining = false;
 let volTimeout = null;
 
+// Variables pour avance/retour rapide
+let seekInterval = null;
+let isSeeking = false;
+let seekStartTime = 0;
+let isMouseDown = false; // Sécurité supplémentaire
+
 let currentAngleL = -55;
 let currentAngleR = -55;
 let targetAngleL = -55;
@@ -41,19 +47,14 @@ let targetAngleR = -55;
 // Fonction pour afficher le volume ou le MUTE
 function showVolumeBriefly(forceMuteDisplay = false) {
     if (!isPoweredOn || !volDisplay) return;
-    
     clearTimeout(volTimeout);
-
     if (isMuted) {
         volDisplay.textContent = "MUTE";
         volDisplay.style.opacity = "1";
     } else {
         volDisplay.textContent = `VOL: ${Math.round(currentVolume * 100)}%`;
         volDisplay.style.opacity = "1";
-        
-        volTimeout = setTimeout(() => {
-            volDisplay.style.opacity = "0";
-        }, 2000);
+        volTimeout = setTimeout(() => { volDisplay.style.opacity = "0"; }, 2000);
     }
 }
 
@@ -138,15 +139,46 @@ function loadTrack(index) {
     audio.play().then(() => updateStatusIcon('play')).catch(e => console.warn("Interaction requise"));
 }
 
+// --- GESTION AVANCE / RETOUR RAPIDE ---
+function startSeeking(direction) {
+    if (!isPoweredOn || playlist.length === 0) return;
+    isMouseDown = true;
+    isSeeking = false;
+    seekStartTime = Date.now();
+    
+    clearInterval(seekInterval);
+    seekInterval = setInterval(() => {
+        if (isMouseDown && Date.now() - seekStartTime > 500) {
+            isSeeking = true;
+            audio.currentTime += (direction === 'next' ? 3 : -3);
+        }
+    }, 100);
+}
+
+function stopSeeking(direction) {
+    if (!isMouseDown) return; // Empêche le déclenchement au simple survol
+    
+    clearInterval(seekInterval);
+    if (isPoweredOn && playlist.length > 0) {
+        if (!isSeeking) {
+            // Simple clic : changement de piste
+            if (direction === 'next' && currentIndex < playlist.length - 1) {
+                loadTrack(currentIndex + 1);
+            } else if (direction === 'prev' && currentIndex > 0) {
+                loadTrack(currentIndex - 1);
+            }
+        }
+    }
+    isSeeking = false;
+    isMouseDown = false;
+}
+
 // --- EVENEMENTS ---
 inputBtn.addEventListener('click', () => { fileUpload.click(); });
 
 fileUpload.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
-        if (!isPoweredOn) {
-            isPoweredOn = true;
-            powerLed.classList.add('active');
-        }
+        if (!isPoweredOn) { isPoweredOn = true; powerLed.classList.add('active'); }
         playlist = Array.from(e.target.files);
         loadTrack(0);
     }
@@ -155,37 +187,28 @@ fileUpload.addEventListener('change', (e) => {
 playPauseBtn.addEventListener('click', () => {
     if (!isPoweredOn || playlist.length === 0) return;
     initEngine();
-    if (audio.paused) {
-        audio.play();
-        updateStatusIcon('play');
-    } else {
-        audio.pause();
-        updateStatusIcon('pause');
-    }
+    if (audio.paused) { audio.play(); updateStatusIcon('play'); } 
+    else { audio.pause(); updateStatusIcon('pause'); }
 });
 
-prevBtn.addEventListener('click', () => {
-    if (!isPoweredOn || playlist.length === 0) return;
-    if (currentIndex > 0) loadTrack(currentIndex - 1);
-});
+// Next Button corrigé
+nextBtn.addEventListener('mousedown', (e) => { if(e.button === 0) startSeeking('next'); });
+nextBtn.addEventListener('mouseup', () => stopSeeking('next'));
+nextBtn.addEventListener('mouseleave', () => { isMouseDown = false; clearInterval(seekInterval); });
 
-nextBtn.addEventListener('click', () => {
-    if (!isPoweredOn || playlist.length === 0) return;
-    if (currentIndex < playlist.length - 1) loadTrack(currentIndex + 1);
-});
+// Prev Button corrigé
+prevBtn.addEventListener('mousedown', (e) => { if(e.button === 0) startSeeking('prev'); });
+prevBtn.addEventListener('mouseup', () => stopSeeking('prev'));
+prevBtn.addEventListener('mouseleave', () => { isMouseDown = false; clearInterval(seekInterval); });
 
 stopBtn.addEventListener('click', () => {
     if (!isPoweredOn) return;
-    audio.pause();
-    audio.currentTime = 0;
-    updateStatusIcon('stop');
+    audio.pause(); audio.currentTime = 0; updateStatusIcon('stop');
 });
 
 muteBtn.addEventListener('click', () => {
     if (!isPoweredOn) return;
-    isMuted = !isMuted;
-    audio.muted = isMuted;
-    showVolumeBriefly(true); 
+    isMuted = !isMuted; audio.muted = isMuted; showVolumeBriefly(true); 
 });
 
 if (timeDisplay) {
@@ -209,10 +232,9 @@ audio.addEventListener('timeupdate', () => {
     }
 });
 
-// --- CONTROLE VOLUME (Initialisé à 5%) ---
+// --- CONTROLE VOLUME ---
 let currentVolume = 0.05;
 audio.volume = currentVolume;
-// On applique la rotation initiale pour 5%
 volumeKnob.style.transform = `rotate(${currentVolume * 270 - 135}deg)`;
 
 function updateVolumeDisplay() {
@@ -225,16 +247,11 @@ volumeKnob.addEventListener('click', (e) => {
     if (!isPoweredOn) return;
     const rect = volumeKnob.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    if (x < rect.width / 2) {
-        currentVolume = Math.max(0, currentVolume - 0.05);
-    } else {
-        currentVolume = Math.min(1, currentVolume + 0.05);
-    }
+    currentVolume = (x < rect.width / 2) ? Math.max(0, currentVolume - 0.05) : Math.min(1, currentVolume + 0.05);
     updateVolumeDisplay();
 });
 
 volumeKnob.addEventListener('mouseenter', showVolumeBriefly);
-
 volumeKnob.addEventListener('wheel', (e) => {
     if (!isPoweredOn) return;
     e.preventDefault();
@@ -243,11 +260,8 @@ volumeKnob.addEventListener('wheel', (e) => {
 });
 
 audio.onended = () => {
-    if (currentIndex < playlist.length - 1) {
-        loadTrack(currentIndex + 1);
-    } else {
-        updateStatusIcon('stop');
-    }
+    if (currentIndex < playlist.length - 1) loadTrack(currentIndex + 1);
+    else updateStatusIcon('stop');
 };
 
 function animate() {
