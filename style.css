@@ -17,7 +17,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: roboto, sans-serif;
     overflow: hidden;
 }
 
@@ -108,7 +108,7 @@ body {
     justify-content: center; 
     align-items: center;
     color: var(--mc-blue); 
-    font-family: 'Courier New', monospace;
+    font-family: roboto ;
     text-shadow: 0 0 15px var(--mc-blue); 
     letter-spacing: 4px;
     position: relative;
@@ -164,7 +164,7 @@ body {
 .vfd-small { 
     font-size: 18px; 
     margin-bottom: 5px; 
-    font-family: 'Courier New', monospace;
+    font-family: roboto, sans-serif;
 }
 
 .vfd-large { 
@@ -262,6 +262,7 @@ body {
     font-weight: bold; 
     text-transform: uppercase; 
     text-align: center; 
+    font-family: 'Roboto', sans-serif;
 }
 
 .small-label i { font-size: 14px; color: var(--mc-green); }
