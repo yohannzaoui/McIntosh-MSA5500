@@ -169,7 +169,7 @@ pwr.addEventListener('click', () => {
         targetAngleL = -55;
         targetAngleR = -55;
     } else {
-        vfdLarge.textContent = "Press input to select your tracks";
+        vfdLarge.textContent = "Push input to select your tracks";
         updateStatusIcon('stop');
     }
 });
