@@ -69,6 +69,11 @@ let targetAngleR = -55;
 let isRandom = false;
 let repeatMode = 0;
 
+// VARIABLES BOUCLE A-B
+let abMode = 0; // 0: OFF, 1: A, 2: B (Loop)
+let pointA = 0;
+let pointB = 0;
+
 let volHoldInterval = null;
 
 // --- INITIALISATION VOLUME ---
@@ -117,7 +122,7 @@ function updateStatusIcon(state) {
     }
 }
 
-// --- MISE À JOUR VFD (RANDOM/REPEAT) ---
+// --- MISE À JOUR VFD (RANDOM / REPEAT / A-B) ---
 function updateVFDStatusDisplay() {
     let modeIndicator = document.getElementById('vfd-mode-indicator');
     if (!modeIndicator) {
@@ -132,7 +137,18 @@ function updateVFDStatusDisplay() {
     if (repeatMode === 1) repeatText = "REPEAT 1";
     else if (repeatMode === 2) repeatText = "REPEAT ALL";
 
-    if (modeIndicator) modeIndicator.innerHTML = `<span>${isRandom ? "RANDOM" : ""}</span><span>${repeatText}</span>`;
+    let abText = "";
+    if (abMode === 1) abText = "A -";
+    else if (abMode === 2) abText = "A - B";
+
+    if (modeIndicator) {
+        // L'ordre est maintenant : RANDOM | REPEAT | A-B
+        modeIndicator.innerHTML = `
+            <span>${isRandom ? "RANDOM" : ""}</span>
+            <span>${repeatText}</span>
+            <span style="color: #00ff66;">${abText}</span>
+        `;
+    }
 }
 
 // --- POWER ON/OFF / REINITIALISATION ---
@@ -148,6 +164,7 @@ pwr.addEventListener('click', () => {
         audio.muted = false;
         isRandom = false;
         repeatMode = 0;
+        abMode = 0; // Reset A-B
         bassGain = 0;
         trebleGain = 0;
 
@@ -169,7 +186,7 @@ pwr.addEventListener('click', () => {
         targetAngleL = -55;
         targetAngleR = -55;
     } else {
-        vfdLarge.textContent = "Press input to select your tracks";
+        vfdLarge.textContent = "Push input to select your tracks";
         updateStatusIcon('stop');
     }
 });
@@ -179,7 +196,6 @@ function initEngine() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
-        // Création des analyseurs pour chaque canal
         analyserL = audioCtx.createAnalyser();
         analyserR = audioCtx.createAnalyser();
         analyserL.fftSize = 1024;
@@ -202,13 +218,12 @@ function initEngine() {
 
         source = audioCtx.createMediaElementSource(audio);
 
-        // Connexions
         source.connect(bassFilter);
         bassFilter.connect(trebleFilter);
         trebleFilter.connect(splitter);
 
-        splitter.connect(analyserL, 0); // Canal 0 -> Gauche
-        splitter.connect(analyserR, 1); // Canal 1 -> Droite
+        splitter.connect(analyserL, 0); 
+        splitter.connect(analyserR, 1); 
 
         trebleFilter.connect(audioCtx.destination);
     }
@@ -282,6 +297,9 @@ if (toneReset) {
 function loadTrack(index) {
     if (playlist.length === 0 || !isPoweredOn) return;
     currentIndex = index;
+    abMode = 0; // Reset A-B lors du changement de track
+    updateVFDStatusDisplay();
+    
     const file = playlist[currentIndex];
     trackCount.textContent = `${currentIndex + 1}/${playlist.length}`;
     fileFormat.textContent = file.name.split('.').pop().toUpperCase();
@@ -382,8 +400,31 @@ document.getElementById('repeat-btn')?.addEventListener('click', () => {
     repeatMode = (repeatMode + 1) % 3; updateVFDStatusDisplay();
 });
 
+// LOGIQUE BOUTON A-B
+document.getElementById('ab-loop-btn')?.addEventListener('click', () => {
+    if (!isPoweredOn || playlist.length === 0) return;
+    abMode = (abMode + 1) % 3;
+    if (abMode === 1) {
+        pointA = audio.currentTime;
+        showStatusBriefly("POINT A SET");
+    } else if (abMode === 2) {
+        pointB = audio.currentTime;
+        if (pointB <= pointA) pointB = pointA + 1;
+        audio.currentTime = pointA;
+        showStatusBriefly("LOOP ACTIVE");
+    } else {
+        showStatusBriefly("LOOP OFF");
+    }
+    updateVFDStatusDisplay();
+});
+
 audio.addEventListener('timeupdate', () => {
     if (isPoweredOn && timeDisplay && !isNaN(audio.currentTime)) {
+        // Boucle A-B
+        if (abMode === 2 && audio.currentTime >= pointB) {
+            audio.currentTime = pointA;
+        }
+        
         let displaySeconds = (isShowingRemaining && !isNaN(audio.duration)) ? audio.duration - audio.currentTime : audio.currentTime;
         const mins = Math.floor(displaySeconds / 60).toString().padStart(2, '0');
         const secs = Math.floor(displaySeconds % 60).toString().padStart(2, '0');
@@ -433,13 +474,11 @@ audio.onended = () => {
 function animate() {
     requestAnimationFrame(animate);
     if (analyserL && analyserR && !audio.paused && isPoweredOn) {
-        // Canal Gauche
         analyserL.getByteFrequencyData(dataArrayL);
         let levelL = dataArrayL.reduce((a, b) => a + b) / dataArrayL.length;
         let normalizedL = Math.pow(Math.min(255, levelL * 1.8) / 255, 0.7);
         targetAngleL = -55 + normalizedL * 95;
 
-        // Canal Droite
         analyserR.getByteFrequencyData(dataArrayR);
         let levelR = dataArrayR.reduce((a, b) => a + b) / dataArrayR.length;
         let normalizedR = Math.pow(Math.min(255, levelR * 1.8) / 255, 0.7);
@@ -456,7 +495,6 @@ function animate() {
 }
 animate();
 
-// --- GESTION DU POPUP OPTIONS ---
 const optionsPopup = document.getElementById('options-popup');
 const btnOpt = document.getElementById('options-btn'); 
 function toggleOptions(e) {
@@ -467,7 +505,6 @@ function toggleOptions(e) {
 }
 btnOpt?.addEventListener('click', toggleOptions);
 
-// --- GESTION DU BOUTON DISPLAY (ID UNIQUE) ---
 const displayBtn = document.getElementById('display-btn'); 
 if (displayBtn) {
     displayBtn.addEventListener('click', () => {
