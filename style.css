@@ -506,20 +506,7 @@ body {
 
 .vfd-large {
     cursor: pointer;
-}
-
-
-/* Le conteneur du VU-mètre */
-.dial {
-    position: relative;
-    width: 100%;
-    height: 140px;
-    background-image: url('TON_URL_IMAGE_ICI');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    border: none;
-    overflow: hidden;
+    text-shadow: 0 0 15px var(--mc-blue);
 }
 
 .meter {
@@ -731,8 +718,10 @@ body {
 /* Pour le compteur de pistes et l'affichage du temps */
 #track-count {
     font-variant-numeric: tabular-nums;
-    display: inline-block; /* Assure que la largeur est respectée */
-    min-width: 3ch;       /* Optionnel : réserve une place de 3 caractères minimum */
+    display: inline-block;
+    /* Assure que la largeur est respectée */
+    min-width: 3ch;
+    /* Optionnel : réserve une place de 3 caractères minimum */
     text-align: left;
     width: 60px;
     margin-right: 38px;
