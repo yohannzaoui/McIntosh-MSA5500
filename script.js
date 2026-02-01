@@ -37,8 +37,13 @@ const popupImg = document.getElementById('popup-img');
 let playlist = [];
 let currentIndex = 0;
 let audioCtx = null;
-let analyser = null;
-let dataArray = null;
+
+// Analyseurs Stéréo
+let analyserL = null;
+let analyserR = null;
+let dataArrayL = null;
+let dataArrayR = null;
+
 let source = null;
 let isPoweredOn = false;
 let isMuted = false;
@@ -164,17 +169,26 @@ pwr.addEventListener('click', () => {
         targetAngleL = -55;
         targetAngleR = -55;
     } else {
-        vfdLarge.textContent = "SELECT INPUT";
+        vfdLarge.textContent = "Press input to select your tracks";
         updateStatusIcon('stop');
     }
 });
 
-// --- MOTEUR AUDIO AVEC EQ ---
+// --- MOTEUR AUDIO AVEC EQ ET STEREO REELLE ---
 function initEngine() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 1024;
+        
+        // Création des analyseurs pour chaque canal
+        analyserL = audioCtx.createAnalyser();
+        analyserR = audioCtx.createAnalyser();
+        analyserL.fftSize = 1024;
+        analyserR.fftSize = 1024;
+
+        dataArrayL = new Uint8Array(analyserL.frequencyBinCount);
+        dataArrayR = new Uint8Array(analyserR.frequencyBinCount);
+
+        const splitter = audioCtx.createChannelSplitter(2);
 
         bassFilter = audioCtx.createBiquadFilter();
         bassFilter.type = "lowshelf";
@@ -186,13 +200,17 @@ function initEngine() {
         trebleFilter.frequency.value = 3000;
         trebleFilter.gain.value = trebleGain;
 
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
         source = audioCtx.createMediaElementSource(audio);
 
+        // Connexions
         source.connect(bassFilter);
         bassFilter.connect(trebleFilter);
-        trebleFilter.connect(analyser);
-        analyser.connect(audioCtx.destination);
+        trebleFilter.connect(splitter);
+
+        splitter.connect(analyserL, 0); // Canal 0 -> Gauche
+        splitter.connect(analyserR, 1); // Canal 1 -> Droite
+
+        trebleFilter.connect(audioCtx.destination);
     }
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
@@ -205,6 +223,9 @@ if (bassUp) {
         if (bassFilter) bassFilter.gain.value = bassGain;
         showStatusBriefly(`BASS: ${bassGain > 0 ? '+' : ''}${bassGain}dB`);
     });
+    bassUp.addEventListener('mouseenter', () => {
+        if (isPoweredOn) showStatusBriefly(`BASS: ${bassGain > 0 ? '+' : ''}${bassGain}dB`);
+    });
 }
 
 if (bassDown) {
@@ -213,6 +234,9 @@ if (bassDown) {
         bassGain = Math.max(-12, bassGain - 2);
         if (bassFilter) bassFilter.gain.value = bassGain;
         showStatusBriefly(`BASS: ${bassGain > 0 ? '+' : ''}${bassGain}dB`);
+    });
+    bassDown.addEventListener('mouseenter', () => {
+        if (isPoweredOn) showStatusBriefly(`BASS: ${bassGain > 0 ? '+' : ''}${bassGain}dB`);
     });
 }
 
@@ -223,6 +247,9 @@ if (trebleUp) {
         if (trebleFilter) trebleFilter.gain.value = trebleGain;
         showStatusBriefly(`TREBLE: ${trebleGain > 0 ? '+' : ''}${trebleGain}dB`);
     });
+    trebleUp.addEventListener('mouseenter', () => {
+        if (isPoweredOn) showStatusBriefly(`TREBLE: ${trebleGain > 0 ? '+' : ''}${trebleGain}dB`);
+    });
 }
 
 if (trebleDown) {
@@ -231,6 +258,9 @@ if (trebleDown) {
         trebleGain = Math.max(-12, trebleGain - 2);
         if (trebleFilter) trebleFilter.gain.value = trebleGain;
         showStatusBriefly(`TREBLE: ${trebleGain > 0 ? '+' : ''}${trebleGain}dB`);
+    });
+    trebleDown.addEventListener('mouseenter', () => {
+        if (isPoweredOn) showStatusBriefly(`TREBLE: ${trebleGain > 0 ? '+' : ''}${trebleGain}dB`);
     });
 }
 
@@ -242,6 +272,9 @@ if (toneReset) {
         if (bassFilter) bassFilter.gain.value = 0;
         if (trebleFilter) trebleFilter.gain.value = 0;
         showStatusBriefly("TONE FLAT");
+    });
+    toneReset.addEventListener('mouseenter', () => {
+        if (isPoweredOn) showStatusBriefly("TONE RESET");
     });
 }
 
@@ -399,27 +432,33 @@ audio.onended = () => {
 
 function animate() {
     requestAnimationFrame(animate);
-    if (analyser && !audio.paused && isPoweredOn) {
-        analyser.getByteFrequencyData(dataArray);
-        let level = dataArray.reduce((a, b) => a + b) / dataArray.length;
-        let normalized = Math.pow(Math.min(255, level * 1.8) / 255, 0.7);
-        targetAngleL = targetAngleR = -55 + normalized * 95;
+    if (analyserL && analyserR && !audio.paused && isPoweredOn) {
+        // Canal Gauche
+        analyserL.getByteFrequencyData(dataArrayL);
+        let levelL = dataArrayL.reduce((a, b) => a + b) / dataArrayL.length;
+        let normalizedL = Math.pow(Math.min(255, levelL * 1.8) / 255, 0.7);
+        targetAngleL = -55 + normalizedL * 95;
+
+        // Canal Droite
+        analyserR.getByteFrequencyData(dataArrayR);
+        let levelR = dataArrayR.reduce((a, b) => a + b) / dataArrayR.length;
+        let normalizedR = Math.pow(Math.min(255, levelR * 1.8) / 255, 0.7);
+        targetAngleR = -55 + normalizedR * 95;
+
         currentAngleL += (targetAngleL - currentAngleL) * 0.25;
         currentAngleR += (targetAngleR - currentAngleR) * 0.25;
-        nl.style.transform = `rotate(${currentAngleL}deg)`;
-        nr.style.transform = `rotate(${currentAngleR}deg)`;
     } else {
         currentAngleL += (-55 - currentAngleL) * 0.1;
         currentAngleR += (-55 - currentAngleR) * 0.1;
-        nl.style.transform = `rotate(${currentAngleL}deg)`;
-        nr.style.transform = `rotate(${currentAngleR}deg)`;
     }
+    nl.style.transform = `rotate(${currentAngleL}deg)`;
+    nr.style.transform = `rotate(${currentAngleR}deg)`;
 }
 animate();
 
 // --- GESTION DU POPUP OPTIONS ---
 const optionsPopup = document.getElementById('options-popup');
-const btnOpt = document.getElementById('options-btn'); // Corrigé pour correspondre à ton HTML
+const btnOpt = document.getElementById('options-btn'); 
 function toggleOptions(e) {
     if (!isPoweredOn) return;
     e.stopPropagation();
@@ -429,7 +468,7 @@ function toggleOptions(e) {
 btnOpt?.addEventListener('click', toggleOptions);
 
 // --- GESTION DU BOUTON DISPLAY (ID UNIQUE) ---
-const displayBtn = document.getElementById('display-btn'); // Corrigé : utilise l'ID direct
+const displayBtn = document.getElementById('display-btn'); 
 if (displayBtn) {
     displayBtn.addEventListener('click', () => {
         if (!isPoweredOn) return;

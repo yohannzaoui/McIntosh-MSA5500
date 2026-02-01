@@ -1,5 +1,4 @@
 /* Importation de la police Bitcount */
-@import url('https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@300&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@300&family=Roboto:wght@300;400&display=swap');
 
 :root {
@@ -9,7 +8,8 @@
     --panel-black: #080808;
     --mc-led-green: #00ff00;
     --mc-gold: #ffd700;
-    /* Vert pur pour le compteur */
+    --police-size-counter: 30px;
+    --police-size-label-counter: 12px;
 }
 
 body {
@@ -152,7 +152,7 @@ body {
 }
 
 .tech-label {
-    font-size: 12px;
+    font-size: var(--police-size-label-counter);
     font-weight: bold;
     letter-spacing: 1px;
     opacity: 0.7;
@@ -167,10 +167,10 @@ body {
 
 #track-count {
     color: var(--mc-led-green);
-    font-size: 25px;
+    font-size: var(--police-size-counter);
     font-weight: 700;
     /* Roboto Bold */
-    font-family: 'Roboto', sans-serif;
+    font-family: 'bitcount single', sans-serif;
     /* Retour à Roboto */
     text-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
 }
@@ -403,8 +403,8 @@ body {
 /* Harmonisation du compteur de temps avec le compteur de track */
 #time-display {
     color: var(--mc-led-green);
-    font-family: 'Roboto', sans-serif;
-    font-size: 25px;
+    font-family: 'bitcount single', sans-serif;
+    font-size: var(--police-size-counter);
     font-weight: 700;
     text-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
     min-width: 70px;
@@ -506,20 +506,7 @@ body {
 
 .vfd-large {
     cursor: pointer;
-}
-
-
-/* Le conteneur du VU-mètre */
-.dial {
-    position: relative;
-    width: 100%;
-    height: 140px;
-    background-image: url('TON_URL_IMAGE_ICI');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    border: none;
-    overflow: hidden;
+    text-shadow: 0 0 15px var(--mc-blue);
 }
 
 .meter {
@@ -726,4 +713,16 @@ body {
 
     text-shadow: 0 0 12px rgba(0, 255, 0, 0.6);
     z-index: 10;
+}
+
+/* Pour le compteur de pistes et l'affichage du temps */
+#track-count {
+    font-variant-numeric: tabular-nums;
+    display: inline-block;
+    /* Assure que la largeur est respectée */
+    min-width: 3ch;
+    /* Optionnel : réserve une place de 3 caractères minimum */
+    text-align: left;
+    width: 60px;
+    margin-right: 38px;
 }
