@@ -8,7 +8,7 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
 
 ![McIntosh_Logo](https://github.com/user-attachments/assets/9f65f1d2-5f77-458b-b0fc-5ec35e992042)
 
-<img width="1812" height="816" alt="Capture d’écran 2026-02-01 215318" src="https://github.com/user-attachments/assets/f307abdb-d163-40be-99ad-bb8e08b8257a" />
+<img width="1813" height="796" alt="1" src="https://github.com/user-attachments/assets/f386474d-2e77-4e49-847c-553ac8d72251" />
 
 ## ✨ Features
 
@@ -572,8 +572,10 @@ This project pays homage to **McIntosh Laboratory**, legendary American manufact
 - [jsmediatags Documentation](https://github.com/aadsm/jsmediatags)
 
 -----
-
-<img width="1815" height="829" alt="1" src="https://github.com/user-attachments/assets/ce51e6a5-9963-4129-9b07-9376b480a72b" />
+<img width="1806" height="794" alt="2" src="https://github.com/user-attachments/assets/bc0b419a-3ef7-4e0e-9545-f7722041c515" />
+<img width="1801" height="795" alt="3" src="https://github.com/user-attachments/assets/5f77d841-ae3c-4b65-8533-cca50b840ea6" />
+<img width="1803" height="798" alt="4" src="https://github.com/user-attachments/assets/b2f0a0fd-f5bd-40a7-9059-e24188fdf1e5" />
+<img width="1803" height="793" alt="5" src="https://github.com/user-attachments/assets/fd1c33d2-b02b-420b-a55b-adc4bc095a74" />
 
 **Enjoy your premium web audio experience! 🎵🎛️**
 
