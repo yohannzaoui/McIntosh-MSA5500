@@ -1,4 +1,4 @@
-# McIntosh MSA5500 - Web Audio Player
+# McIntosh MSA5500 - Premium Audio Player
 
 A premium web-based audio player inspired by the legendary McIntosh amplifier design, featuring authentic VU meters, professional equalizer controls, stereo balance, A-B loop functionality, and a stunning interface that captures the essence of high-end audio equipment.
 
