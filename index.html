@@ -242,6 +242,16 @@
 
         <audio id="main-audio" crossorigin="anonymous"></audio>
 
+        <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('✅ Service Worker OK'))
+                .catch(err => console.log('❌ Erreur:', err));
+        });
+    }
+</script>
+
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
         <script src="script.js"></script>
