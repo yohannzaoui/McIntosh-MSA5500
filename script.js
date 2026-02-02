@@ -62,6 +62,7 @@ let balanceNode = null;
 let bassGain = 0;   // en dB
 let trebleGain = 0; // en dB
 let currentBalance = 0; // -1 (L) à 1 (R)
+let isLoudnessActive = false;
 
 // Variables pour avance/retour rapide
 let seekInterval = null;
@@ -129,6 +130,22 @@ function updateStatusIcon(state) {
     }
 }
 
+// --- LOGIQUE LOUDNESS DYNAMIQUE ---
+function applyLoudnessEffect() {
+    if (!bassFilter || !trebleFilter) return;
+
+    if (isLoudnessActive) {
+        // Effet maximal à bas volume, s'estompe vers 70% de volume
+        const intensity = Math.max(0, (0.7 - currentVolume) / 0.7);
+        bassFilter.gain.value = bassGain + (intensity * 8); // Boost graves jusqu'à +8dB
+        trebleFilter.gain.value = trebleGain + (intensity * 4); // Boost aigus jusqu'à +4dB
+    } else {
+        // Retour aux valeurs normales de l'EQ
+        bassFilter.gain.value = bassGain;
+        trebleFilter.gain.value = trebleGain;
+    }
+}
+
 // --- MISE À JOUR VFD (RANDOM / REPEAT / A-B) ---
 function updateVFDStatusDisplay() {
     let modeIndicator = document.getElementById('vfd-mode-indicator');
@@ -174,6 +191,7 @@ pwr.addEventListener('click', () => {
         bassGain = 0;
         trebleGain = 0;
         currentBalance = 0;
+        isLoudnessActive = false;
 
         currentVolume = 0.05;
         audio.volume = currentVolume;
@@ -189,6 +207,8 @@ pwr.addEventListener('click', () => {
         if (timeDisplay) timeDisplay.textContent = "00:00";
         const modeIndicator = document.getElementById('vfd-mode-indicator');
         if (modeIndicator) modeIndicator.textContent = "";
+        const loudnessText = document.getElementById('vfd-loudness-text');
+        if (loudnessText) loudnessText.classList.remove('loudness-visible');
 
         targetAngleL = -55;
         targetAngleR = -55;
@@ -280,7 +300,7 @@ if (bassUp) {
     bassUp.addEventListener('click', () => {
         if (!isPoweredOn) return;
         bassGain = Math.min(12, bassGain + 2);
-        if (bassFilter) bassFilter.gain.value = bassGain;
+        applyLoudnessEffect(); // Appliquer via le moteur loudness
         showStatusBriefly(`BASS: ${bassGain > 0 ? '+' : ''}${bassGain}dB`);
     });
     bassUp.addEventListener('mouseenter', () => {
@@ -292,7 +312,7 @@ if (bassDown) {
     bassDown.addEventListener('click', () => {
         if (!isPoweredOn) return;
         bassGain = Math.max(-12, bassGain - 2);
-        if (bassFilter) bassFilter.gain.value = bassGain;
+        applyLoudnessEffect();
         showStatusBriefly(`BASS: ${bassGain > 0 ? '+' : ''}${bassGain}dB`);
     });
     bassDown.addEventListener('mouseenter', () => {
@@ -304,7 +324,7 @@ if (trebleUp) {
     trebleUp.addEventListener('click', () => {
         if (!isPoweredOn) return;
         trebleGain = Math.min(12, trebleGain + 2);
-        if (trebleFilter) trebleFilter.gain.value = trebleGain;
+        applyLoudnessEffect();
         showStatusBriefly(`TREBLE: ${trebleGain > 0 ? '+' : ''}${trebleGain}dB`);
     });
     trebleUp.addEventListener('mouseenter', () => {
@@ -316,7 +336,7 @@ if (trebleDown) {
     trebleDown.addEventListener('click', () => {
         if (!isPoweredOn) return;
         trebleGain = Math.max(-12, trebleGain - 2);
-        if (trebleFilter) trebleFilter.gain.value = trebleGain;
+        applyLoudnessEffect();
         showStatusBriefly(`TREBLE: ${trebleGain > 0 ? '+' : ''}${trebleGain}dB`);
     });
     trebleDown.addEventListener('mouseenter', () => {
@@ -328,9 +348,8 @@ if (toneReset) {
     toneReset.addEventListener('click', () => {
         if (!isPoweredOn) return;
         bassGain = 0; trebleGain = 0; currentBalance = 0;
-        if (bassFilter) bassFilter.gain.value = 0;
-        if (trebleFilter) trebleFilter.gain.value = 0;
-
+        if (balanceNode) balanceNode.pan.value = 0;
+        applyLoudnessEffect();
         showStatusBriefly("TONE FLAT");
     });
     toneReset.addEventListener('mouseenter', () => {
@@ -477,6 +496,7 @@ audio.addEventListener('timeupdate', () => {
 function updateVolumeDisplay() {
     audio.volume = currentVolume;
     volumeKnob.style.transform = `rotate(${currentVolume * 270 - 135}deg)`;
+    applyLoudnessEffect(); // Met à jour l'EQ dynamiquement selon le volume
     showVolumeBriefly();
 }
 
@@ -663,3 +683,20 @@ loadTrack = function (index) {
     originalLoadTrack(index);
     setTimeout(updateMediaMetadata, 500);
 };
+
+document.getElementById('loudness-btn').addEventListener('click', function() {
+    if (!isPoweredOn) return;
+    initEngine(); // S'assure que l'audio context est prêt
+    
+    isLoudnessActive = !isLoudnessActive;
+    
+    const loudnessText = document.getElementById('vfd-loudness-text');
+
+    if (isLoudnessActive) {
+        loudnessText.classList.add('loudness-visible');
+    } else {
+        loudnessText.classList.remove('loudness-visible');
+    }
+    
+    applyLoudnessEffect();
+});
