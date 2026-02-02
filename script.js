@@ -99,8 +99,14 @@ function showStatusBriefly(text) {
 }
 
 function showVolumeBriefly() {
-    if (isMuted) showStatusBriefly("MUTE");
-    else showStatusBriefly(`VOL: ${Math.round(currentVolume * 100)}%`);
+    if (isMuted) {
+        // On annule le timeout pour que "MUTE" reste fixe
+        clearTimeout(volTimeout);
+        volDisplay.textContent = "MUTE";
+        volDisplay.style.opacity = "1";
+    } else {
+        showStatusBriefly(`VOL: ${Math.round(currentVolume * 100)}%`);
+    }
 }
 
 function updateStatusIcon(state) {
