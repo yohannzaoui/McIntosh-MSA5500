@@ -288,20 +288,41 @@ function startSeeking(dir) {
         }
     }, 100);
 }
+
 function stopSeeking(dir) {
     if (!isMouseDown) return;
     clearInterval(seekInterval);
+    
     if (isPoweredOn && playlist.length > 0 && !isSeeking) {
         if (dir === 'next') {
+            // Logique NEXT (inchangée)
             if (isRandom && playlist.length > 1) {
                 let n; do { n = Math.floor(Math.random() * playlist.length); } while (n === currentIndex);
                 loadTrack(n);
             } else if (currentIndex < playlist.length - 1) loadTrack(currentIndex + 1);
             else if (repeatMode === 2) loadTrack(0);
-        } else if (currentIndex > 0) loadTrack(currentIndex - 1);
+        } else {
+            // --- LOGIQUE PREV EN DEUX TEMPS ---
+            if (audio.currentTime > 3) {
+                // Temps > 3s : On recommence le morceau
+                audio.currentTime = 0;
+                if (audio.paused) audio.play();
+            } else {
+                // Temps < 3s : On va à la piste précédente
+                if (currentIndex > 0) {
+                    loadTrack(currentIndex - 1);
+                } else if (repeatMode === 2) {
+                    loadTrack(playlist.length - 1); // Retour à la fin si REPEAT ALL
+                } else {
+                    audio.currentTime = 0; // Sécurité si c'est la première piste
+                }
+            }
+        }
     }
-    isSeeking = false; isMouseDown = false;
+    isSeeking = false; 
+    isMouseDown = false;
 }
+
 nextBtn.addEventListener('mousedown', () => startSeeking('next'));
 nextBtn.addEventListener('mouseup', () => stopSeeking('next'));
 prevBtn.addEventListener('mousedown', () => startSeeking('prev'));

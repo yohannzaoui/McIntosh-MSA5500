@@ -8,9 +8,51 @@
     --panel-black: #080808;
     --mc-led-green: #00ff00;
     --mc-led-red: #ff0000;
-    --mc-gold: #ffd700;
+    --mc-gold: #786b46;
     --police-size-counter: 30px;
     --police-size-label-counter: 12px;
+}
+
+/* --- COMPATIBILITÉ IPAD & TABLETTES --- */
+@media screen and (max-width: 1100px) {
+    .chassis-wrapper {
+        /* On réduit la taille globale pour que ça rentre dans l'écran */
+        transform: scale(0.85); 
+        transform-origin: center center;
+    }
+    
+    body {
+        /* On empêche le scroll si possible, ou on l'autorise si l'écran est vraiment petit */
+        overflow-y: auto; 
+        align-items: flex-start; /* Évite que le haut soit coupé si on scale */
+        padding-top: 20px;
+    }
+}
+
+/* --- IPAD PORTRAIT (Plus étroit) --- */
+@media screen and (max-width: 800px) {
+    .chassis-wrapper {
+        transform: scale(0.7);
+    }
+    
+    .side-trim {
+        display: none; /* On cache les bords en alu pour gagner de la place sur petit iPad */
+    }
+}
+
+/* Empêche le zoom bleu par défaut sur iPad quand on touche un bouton */
+.btn-base, .knob-outer, #display-btn {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 1024px) {
+    .matrix-display {
+        width: 90vw; /* Utilise la largeur de l'écran */
+        max-width: 950px;
+        transform: translateY(-10px); /* On réduit le décalage sur tablette */
+    }
 }
 
 body {
@@ -389,7 +431,7 @@ body {
     padding-top: 4px;
     left: 50%;
     transform: translateX(-50%);
-    color: #c0c0c0;
+    color: var(--mc-gold);
     font-weight: bold;
 }
 
@@ -607,7 +649,7 @@ body {
 }
 
 .push-label-input {
-    color: #c0c0c0;
+    color: var(--mc-gold);
     font-family: 'Roboto', sans-serif;
     font-size: 10px;
     font-weight: 900;
@@ -623,7 +665,7 @@ body {
 }
 
 .push-label-volume {
-    color: #c0c0c0;
+    color: var(--mc-gold);
     font-family: 'Roboto', sans-serif;
     font-size: 10px;
     font-weight: 900;
@@ -699,7 +741,7 @@ body {
     font-family: 'Roboto', sans-serif;
     font-size: 10px;
     font-weight: 700;
-    color: #c0c0c0;
+    color: var(--mc-gold);
     letter-spacing: 0.5px;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
