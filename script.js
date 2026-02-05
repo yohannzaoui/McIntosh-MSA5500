@@ -148,21 +148,9 @@ function updateVFDStatusDisplay() {
     modeIndicator.innerHTML = `<span>${isRandom ? "RANDOM" : ""}</span><span>${repeatText}</span><span style="color: #00ff66;">${abText}</span>`;
 }
 
-// --- POWER ---
+// --- POWER (MODIFIÉ POUR RAFRAICHIR LA PAGE) ---
 pwr.addEventListener('click', () => {
-    isPoweredOn = !isPoweredOn;
-    if (!isPoweredOn) {
-        audio.pause(); audio.src = ""; playlist = [];
-        isRandom = false; repeatMode = 0; abMode = 0; isMonoActive = false;
-        vfdLarge.textContent = "SYSTEM OFF"; vfdInfo.textContent = "";
-        document.getElementById('led-mono')?.classList.remove('active');
-        targetAngleL = targetAngleR = -55;
-        document.querySelector('.power-led').classList.remove('active');
-    } else {
-        vfdLarge.textContent = "Push input to select your tracks";
-        document.querySelector('.power-led').classList.add('active');
-        updateStatusIcon('stop');
-    }
+    location.reload();
 });
 
 // --- ENGINE ---
