@@ -709,7 +709,7 @@ body {
     border-radius: 15px;
     padding: 20px;
     width: 400px;
-    max-height: 700px; 
+    max-height: 700px;
     overflow-y: auto;
 }
 
@@ -1018,9 +1018,9 @@ body {
     margin-top: 10px;
     width: 100%;
 
-.playlist-logo-container {
-    text-align: center;
-    margin-top: 30px;
-    margin-bottom: 20px;
-    width: 100%;
-}
+    .playlist-logo-container {
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        width: 100%;
+    }
