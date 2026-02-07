@@ -45,17 +45,17 @@ function setThumbar(isPlaying) {
     {
       tooltip: 'Précédent',
       // IL FAUT UN CHEMIN VERS UNE IMAGE PNG ICI
-      icon: path.join(__dirname, 'assets/img/windowsbar/prev.png'), 
+      icon: path.join(__dirname, 'assets/windowsbar/prev.png'), 
       click() { win.webContents.send('media-control', 'prev'); }
     },
     {
       tooltip: isPlaying ? 'Pause' : 'Play',
-      icon: isPlaying ? path.join(__dirname, 'assets/img/windowsbar/pause.png') : path.join(__dirname, 'assets/img/windowsbar/play.png'),
+      icon: isPlaying ? path.join(__dirname, 'assets/windowsbar/pause.png') : path.join(__dirname, 'assets/windowsbar/play.png'),
       click() { win.webContents.send('media-control', 'play-pause'); }
     },
     {
       tooltip: 'Suivant',
-      icon: path.join(__dirname, 'assets/img/windowsbar/next.png'),
+      icon: path.join(__dirname, 'assets/windowsbar/next.png'),
       click() { win.webContents.send('media-control', 'next'); }
     }
   ]);
