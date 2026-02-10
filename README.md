@@ -1,7 +1,7 @@
 # McIntosh MSA5500
 ## Inspired by the high-end McIntosh MSA5500 2-Channel Streaming Integrated Amplifier
 
-A premium web-based audio player inspired by the legendary McIntosh amplifier design, featuring authentic VU meters, professional equalizer controls, stereo balance, A-B loop functionality, mono mode, loudness compensation, power guard protection, and a stunning interface that captures the essence of high-end audio equipment.
+A premium web-based audio player inspired by the legendary McIntosh amplifier design, featuring authentic VU meters, professional 10-band equalizer, stereo balance, A-B loop functionality, mono mode, loudness compensation, power guard protection, customizable visual themes, and a stunning interface that captures the essence of high-end audio equipment.
 
 ![McIntosh MSA5500](https://img.shields.io/badge/McIntosh-MSA5500-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
@@ -15,7 +15,7 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
 
 ### 🎵 Audio Playback
 
-- **Multi-format support**: FLAC, MP3, MP4, WAV
+- **Multi-format support**: FLAC, MP3, MP4/M4A, WAV, AAC, ALAC, OGG
 - **Multiple loading methods**: 
   - INPUT knob: Click to select individual files (multiple selection supported)
   - LIBRARY button: Load entire folders and browse tracks in organized modal
@@ -40,6 +40,10 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
   - Automatic validation (B must be after A)
   - Visual indicator "A-B" in VFD display
 - **Media session integration**: Control playback from keyboard media keys and system controls
+  - Native browser controls support
+  - Chrome/Edge position state tracking
+  - Previous/Next track navigation
+  - Play/Pause control
 - **Automatic track progression**: Respects repeat and random modes when track ends
 - **Progressive Web App (PWA)**: Installable with service worker for offline caching
 - **Electron desktop app**: Cross-platform desktop application with system integration
@@ -55,11 +59,12 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
   - Authentic McIntosh meter design with custom background image
   - Power-law response curve for natural meter movement
   - Automatic return to rest position when stopped
+  - Alternate background mode available (meter-alt-bg)
 - **VFD Display**: Premium vacuum fluorescent display showing:
   - Track title with dynamic text sizing (auto-fits content)
   - Artist and album information
   - Current track number and total tracks (clickable for playlist)
-  - File format indicator (FLAC, MP3, WAV, MP4)
+  - File format indicator (FLAC, MP3, WAV, MP4, AAC/ALAC, OGG)
   - Bitrate calculation (estimated for VBR files)
   - Playback time with elapsed/remaining toggle (clickable)
   - Playback status icons (PLAY, PAUSE, STOP) with blinking pause indicator
@@ -68,7 +73,10 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
   - Volume display overlay (auto-hides after 2 seconds)
 - **Display modes**:
   - Normal mode with full illumination
-  - Stealth mode (complete blackout - VFD and VU meters dimmed)
+  - Alternate logo display (toggle between mc-logo.png and mc-logo-off.png)
+  - Alternate VU meter backgrounds
+  - Complete VFD blackout mode
+  - Label dimming (all green labels turn gray when display is off)
 - **Album art viewer**: Click track title to view embedded album artwork in popup modal
 - **Interactive playlist**: Click track counter to browse and select tracks from popup menu
 - **Status LEDs**:
@@ -76,6 +84,11 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
   - MONO LED (green) - active when mono mode enabled
   - POWER GUARD LEDs (red, left and right) - blink rapidly when volume ≥ 90%
 - **Reboot confirmation modal**: Safety popup to confirm system restart
+- **Visual theme customization**:
+  - Background color picker - customize app background
+  - Shadow color picker - adjust chassis shadow color
+  - Real-time color preview in buttons
+  - Persistent across sessions
 
 ### 🎛️ Audio Controls
 
@@ -91,7 +104,17 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
   - Instant audio muting with status display
   - Shows "MUTE" in volume display area
   - Preserves volume setting
-- **2-Band Equalizer**:
+- **10-Band Graphic Equalizer**:
+  - Professional frequency control across the entire audio spectrum
+  - Frequencies: 32Hz, 64Hz, 125Hz, 250Hz, 500Hz, 1kHz, 2kHz, 4kHz, 8kHz, 16kHz
+  - Range: ±12dB per band
+  - Musical Q factor (1.4) for natural sound shaping
+  - Real-time Web Audio API processing with Peaking filters
+  - Dedicated popup interface with vertical sliders
+  - Visual frequency labels and gain indicators
+  - FLAT reset button to restore all bands to 0dB
+  - Independent from bass/treble tone controls
+- **2-Band Tone Controls** (Classic McIntosh style):
   - Bass control: ±12dB at 200Hz (low shelf filter)
     - Adjustable in 2dB steps
     - Range: -12dB to +12dB
@@ -103,7 +126,6 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
 - **Stereo Balance**:
   - Left/Right balance adjustment (-1 to +1)
   - Web Audio API StereoPanner for precise control
-  - Keyboard shortcuts (Arrow keys)
   - Step-based adjustment (0.1 increments)
   - Disabled when Mono mode is active
 - **Mono Mode**:
@@ -130,7 +152,7 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
 - **Library Management**:
   - Dedicated LIBRARY button for folder-based loading
   - Modal interface for browsing and selecting tracks
-  - Automatic audio file filtering (supports all audio/* MIME types)
+  - Automatic audio file filtering (supports all audio/* MIME types + M4A/AAC/OGG)
   - Track list displayed with green play indicators
   - Click any track to load and start playback
   - Displays total track count on load
@@ -139,10 +161,12 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
 - **Web Audio API processing**: Professional audio graph with:
   - MediaElementSourceNode for audio input
   - StereoPanner for balance control
-  - Two BiquadFilter nodes for bass/treble EQ
+  - Two BiquadFilter nodes for bass/treble tone controls
+  - Ten BiquadFilter nodes for 10-band graphic equalizer (Peaking type)
   - ChannelSplitter for stereo separation
   - Dual AnalyserNodes for independent L/R VU meters
   - Real-time frequency analysis (FFT size: 1024)
+  - Complete signal chain with seamless integration
 - **ID3 tag extraction**: 
   - Automatic metadata reading with jsmediatags 3.9.5 library
   - Extracts title, artist, album, and embedded artwork
@@ -157,6 +181,11 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
   - Positioned to the right of main interface
   - Gold border McIntosh styling
   - Includes logo, dividers, and organized button groups
+  - Access to EQ, Loudness, Mono, Balance, and visual customization
+- **Info display**:
+  - Dedicated INFO button in options menu
+  - Full-screen overlay with application information
+  - Click anywhere to close
 - **Persistent power state**: 
   - LED indicator shows system status
   - Complete system reset on power off
@@ -168,12 +197,14 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
   - Bitcount Single font for VFD display
   - Roboto font for labels and controls
   - Blue (#00c3ff) and green (#00ff41) accent colors
-  - Gold (#ffd700) highlights for special elements
+  - Gold (#786b46) highlights for special elements
+  - Customizable background and shadow colors
 - **Click-outside-to-close**: 
   - Options menu closes when clicking outside
   - Playlist popup closes when clicking outside
   - Album art popup closes on overlay click
   - Library modal closes on overlay click or X button
+  - EQ popup closes on overlay click or X button
 - **Seek Hold Feature**:
   - Hold previous/next buttons for 500ms to activate seeking
   - 3-second jumps every 100ms while holding
@@ -189,6 +220,12 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
   - Global keyboard shortcut support for media keys
   - Proper window lifecycle management
   - Cross-platform support (Windows, macOS, Linux)
+- **iPad & Tablet Compatibility**:
+  - Responsive scaling (0.85x on screens < 1100px, 0.7x on < 800px)
+  - Touch-optimized controls with tap-highlight disabled
+  - Automatic scroll handling on smaller displays
+  - Side trims hidden on portrait mode to save space
+  - Adaptive VFD display width (90vw on tablets)
 
 ## 🚀 Getting Started
 
@@ -325,7 +362,7 @@ The Electron version includes additional features:
    - Click INPUT knob to select files, OR
    - Click LIBRARY button to load a folder
 3. **Play**: Click the PLAY/PAUSE button
-4. **Adjust**: Use VOLUME knob and tone controls in OPTIONS menu
+4. **Adjust**: Use VOLUME knob and controls in OPTIONS menu
 
 ### Interface Overview
 
@@ -337,7 +374,7 @@ The Electron version includes additional features:
 ├─────────────────────────────────────────────────────────┤
 │                  VFD DISPLAY AREA                       │
 │  Track 1/10      Title - Artist - Album      --:--     │
-│  FLAC 1411 KBPS                                         │
+│  FLAC 1411 KBPS                              [STATUS]  │
 ├─────────────────────────────────────────────────────────┤
 │ [INPUT] [◄◄] [►►] [▶/❚❚] [■] [MUTE] [OPTIONS] [VOL]  │
 └─────────────────────────────────────────────────────────┘
@@ -358,21 +395,41 @@ The Electron version includes additional features:
 | **■ (STOP)** | Stop playback | Resets to track start |
 | **MUTE** | Toggle mute | Preserves volume level |
 | **VOLUME** | Adjust volume | Click/hold or mouse wheel |
+| **DISPLAY** | Toggle display modes | Cycles through visual states |
 
 #### OPTIONS Menu Controls
 
 | Control | Function | Range/Steps |
 |---------|----------|-------------|
-| **BASS ↑/↓** | Adjust bass EQ | ±12dB in 2dB steps |
-| **TREBLE ↑/↓** | Adjust treble EQ | ±12dB in 2dB steps |
-| **BALANCE L/R** | Stereo balance | -100% to +100% in 10% steps |
-| **TONE RESET** | Reset EQ and balance | Flat 0dB, center balance |
-| **MONO** | Mono/stereo mode | Green LED when active |
-| **LOUDNESS** | Fletcher-Munson curve | Automatic at low volumes |
-| **STEALTH** | Display blackout | Dims all lights |
+| **RANDOM** | Shuffle mode | On/Off |
 | **REPEAT** | Repeat modes | Off → (1) → (ALL) |
-| **RANDOM** | Shuffle playback | Avoids immediate repeats |
 | **A-B LOOP** | Set loop points | A → A-B → Off |
+| **LIBRARY** | Open folder browser | - |
+| **EQ** | 10-band equalizer | ±12dB per band |
+| **LOUDNESS** | Fletcher-Munson curve | Automatic at low volumes |
+| **MONO** | Mono/stereo mode | Green LED when active |
+| **BASS ↑/↓** | Adjust bass tone | ±12dB in 2dB steps |
+| **TONE RESET** | Reset tone & balance | Flat 0dB, center balance |
+| **TREBLE ↑/↓** | Adjust treble tone | ±12dB in 2dB steps |
+| **BALANCE L/R** | Stereo balance | -100% to +100% in 10% steps |
+| **BACK COLOR** | Background color | Color picker |
+| **SHADOW COLOR** | Chassis shadow | Color picker |
+| **INFO** | Application info | Full-screen overlay |
+
+### Equalizer Panel (EQ Popup)
+
+| Frequency | Type | Q Factor | Range |
+|-----------|------|----------|-------|
+| **32 Hz** | Peaking | 1.4 | ±12dB |
+| **64 Hz** | Peaking | 1.4 | ±12dB |
+| **125 Hz** | Peaking | 1.4 | ±12dB |
+| **250 Hz** | Peaking | 1.4 | ±12dB |
+| **500 Hz** | Peaking | 1.4 | ±12dB |
+| **1 kHz** | Peaking | 1.4 | ±12dB |
+| **2 kHz** | Peaking | 1.4 | ±12dB |
+| **4 kHz** | Peaking | 1.4 | ±12dB |
+| **8 kHz** | Peaking | 1.4 | ±12dB |
+| **16 kHz** | Peaking | 1.4 | ±12dB |
 
 ### Keyboard Shortcuts
 
@@ -392,18 +449,21 @@ The Electron version includes additional features:
 - **Click time display**: Toggle elapsed/remaining time
 - **Click VFD modes**: Displays current settings
 - **Hover volume knob**: Shows current volume level
-- **Hover EQ controls**: Shows current EQ values
+- **Hover tone controls**: Shows current tone values
+- **Hover balance controls**: Shows current balance value
 
 ### Tips & Tricks
 
-1. **Accurate EQ**: Hover over BASS/TREBLE controls to see exact dB values
-2. **Quick Reset**: Use TONE RESET to return to neutral audio
-3. **Loudness**: Automatically enhances bass/treble at low volumes
-4. **Power Guard**: Red LEDs warn when volume ≥90%
-5. **Seek Mode**: Hold ◄◄ or ►► for 500ms to jump through track
-6. **A-B Practice**: Perfect for musicians - loop difficult sections
-7. **Mono Mode**: Useful for checking mixes and voice-over work
-8. **Stealth Mode**: Minimalist listening with display off
+1. **Professional EQ**: Use the 10-band equalizer for precise frequency control
+2. **Quick Tone**: Use BASS/TREBLE for fast adjustments, EQ for detailed shaping
+3. **Visual Themes**: Customize colors to match your setup or mood
+4. **Loudness**: Automatically enhances bass/treble at low volumes
+5. **Power Guard**: Red LEDs warn when volume ≥90%
+6. **Seek Mode**: Hold ◄◄ or ►► for 500ms to jump through track
+7. **A-B Practice**: Perfect for musicians - loop difficult sections
+8. **Mono Mode**: Useful for checking mixes and voice-over work
+9. **Display Toggle**: Cycle through different visual states for ambiance
+10. **Tablet Mode**: Works great on iPad - optimized responsive design
 
 ## 🛠️ Technical Details
 
@@ -416,13 +476,14 @@ McIntosh MSA5500
 │   ├── index.html          - Main structure
 │   ├── style.css           - Visual styling
 │   ├── script.js           - Core logic and UI control
-│   └── main.js             - Electron main process (desktop only)
+│   ├── main.js             - Electron main process (desktop only)
+│   └── mcintosh-audio-engine.js - Audio processing engine
 │
 ├── Audio Engine
 │   └── Web Audio API Graph:
 │       MediaElement → StereoPanner → BiquadFilter(Bass) 
-│       → BiquadFilter(Treble) → ChannelSplitter 
-│       → AnalyserNode(L/R) → Destination
+│       → BiquadFilter(Treble) → 10x BiquadFilter(EQ Bands)
+│       → ChannelSplitter → AnalyserNode(L/R) → Destination
 │
 ├── Service Worker (PWA)
 │   └── sw.js               - Offline caching
@@ -430,7 +491,8 @@ McIntosh MSA5500
 └── Assets
     ├── img/                - Logos, VU meter backgrounds
     ├── fontawesome7/       - Icon library
-    └── windows/            - Electron taskbar icons (desktop)
+    ├── windows/            - Electron taskbar icons (desktop)
+    └── info/               - Application info image
 ```
 
 ### Web Audio API Graph
@@ -445,11 +507,16 @@ McIntosh MSA5500
 └──────┬────────┘
        │
 ┌──────▼────────┐
-│ BiquadFilter  │ (Bass - Low Shelf)
+│ BiquadFilter  │ (Bass - Low Shelf 200Hz)
 └──────┬────────┘
        │
 ┌──────▼────────┐
-│ BiquadFilter  │ (Treble - High Shelf)
+│ BiquadFilter  │ (Treble - High Shelf 3000Hz)
+└──────┬────────┘
+       │
+┌──────▼────────┐
+│ 10-Band EQ    │ (Peaking Filters)
+│ 32Hz-16kHz    │
 └──────┬────────┘
        │
 ┌──────▼───────────┐
@@ -478,8 +545,10 @@ McIntosh MSA5500
 | **Service Worker** | ✅ | ✅ | ✅ | ✅ |
 | **Media Session** | ✅ | ✅ | ✅ | ✅ |
 | **FLAC Support** | ✅ | ✅ | ❌* | ✅ |
+| **AAC/ALAC** | ✅ | ✅ | ✅ | ✅ |
+| **OGG Vorbis** | ✅ | ✅ | ❌ | ✅ |
 
-\* Safari requires QuickTime for FLAC
+\* Safari requires QuickTime for FLAC and doesn't support OGG
 
 ### File Format Support
 
@@ -488,7 +557,9 @@ McIntosh MSA5500
 | **FLAC** | FLAC | FLAC | Lossless | Preferred for audiophile |
 | **WAV** | WAV | PCM | Lossless | Universal support |
 | **MP3** | MP3 | MPEG-1/2 Layer 3 | 32-320 kbps | Most compatible |
-| **MP4/M4A** | MP4 | AAC | 64-320 kbps | Good quality/size ratio |
+| **MP4/M4A** | MP4 | AAC/ALAC | 64-320 kbps | Good quality/size ratio |
+| **AAC** | AAC | AAC | 64-320 kbps | High quality |
+| **OGG** | OGG | Vorbis | 64-500 kbps | Open format |
 
 ### Performance Specifications
 
@@ -496,9 +567,12 @@ McIntosh MSA5500
 - **VU Meter Refresh Rate**: 60fps (requestAnimationFrame)
 - **Frequency Analysis**: 1024-point FFT
 - **Volume Steps**: 0.01 (1% increments)
-- **EQ Resolution**: 2dB steps
+- **Tone Control Resolution**: 2dB steps
+- **EQ Resolution**: 1dB steps (10-band graphic EQ)
 - **Balance Resolution**: 0.1 (10% steps)
 - **Service Worker Cache**: ~5MB (static assets only)
+- **EQ Bands**: 10 (32Hz to 16kHz)
+- **EQ Q Factor**: 1.4 (musical bandwidth)
 
 ### Security & Privacy
 
@@ -507,6 +581,7 @@ McIntosh MSA5500
 - **No uploads**: Files never leave your device
 - **No server**: Pure client-side application
 - **No cookies**: No data storage beyond PWA cache
+- **Color preferences**: Stored in CSS variables only
 
 ## 🔧 Development
 
@@ -515,43 +590,49 @@ McIntosh MSA5500
 ```
 mcintosh-msa5500/
 │
-├── index.html              # Main HTML structure
-├── style.css               # All styling and animations
-├── script.js               # Core application logic
-├── main.js                 # Electron main process
-├── package.json            # Node.js dependencies & build config
-├── manifest.json           # PWA manifest
-├── sw.js                   # Service Worker for offline functionality
-├── README.md               # This file
-├── LICENSE                 # MIT License
+├── index.html                   # Main HTML structure
+├── style.css                    # All styling and animations
+├── script.js                    # Core application logic
+├── main.js                      # Electron main process
+├── mcintosh-audio-engine.js     # Audio processing engine
+├── package.json                 # Node.js dependencies & build config
+├── manifest.json                # PWA manifest
+├── sw.js                        # Service Worker for offline functionality
+├── README.md                    # This file
+├── LICENSE                      # MIT License
 │
 └── assets/
     ├── img/
-    │   ├── mc-logo.png     # McIntosh logo (on state)
-    │   ├── mc-logo-off.png # McIntosh logo (off state)
-    │   ├── logo_b.png      # Brand logo variant
-    │   ├── favicon.png     # App icon
-    │   ├── favicon.ico     # Windows icon
-    │   └── vumeter-new.png # VU meter background image
+    │   ├── mc-logo.png          # McIntosh logo (on state)
+    │   ├── mc-logo-off.png      # McIntosh logo (off state)
+    │   ├── logo_b.png           # Brand logo variant
+    │   ├── logo_cover.png       # Cover logo
+    │   ├── favicon.png          # App icon
+    │   ├── favicon.ico          # Windows icon
+    │   ├── vumeter-new.png      # VU meter background (normal)
+    │   └── vumeter-new-off.png  # VU meter background (alt)
     │
-    ├── fontawesome7/       # Font Awesome 7 icon library
+    ├── fontawesome7/            # Font Awesome 7 icon library
     │   ├── css/
     │   └── webfonts/
     │
-    └── windows/            # Electron desktop icons
-        ├── prev.png        # Previous button icon
-        ├── play.png        # Play button icon
-        ├── pause.png       # Pause button icon
-        └── next.png        # Next button icon
+    ├── windows/                 # Electron desktop icons
+    │   ├── prev.png             # Previous button icon
+    │   ├── play.png             # Play button icon
+    │   ├── pause.png            # Pause button icon
+    │   └── next.png             # Next button icon
+    │
+    └── info/                    # Application information
+        └── info.png             # Info overlay image
 ```
 
 ### Technology Stack
 
 **Frontend:**
 - HTML5 (Audio API, File API)
-- CSS3 (Animations, Transforms, Gradients)
+- CSS3 (Animations, Transforms, Gradients, Custom Properties)
 - Vanilla JavaScript (ES6+)
-- Web Audio API
+- Web Audio API (Extended with 10-band EQ)
 - Service Worker API
 - Media Session API
 
@@ -613,12 +694,13 @@ npm run dist
 
 1. Update `accept` attribute in `index.html`:
 ```html
-<input type="file" id="audio-upload" accept=".flac,.mp3,.mp4,.wav,.ogg">
+<input type="file" id="audio-upload" accept=".flac,.mp3,.mp4,.wav,.m4a,.aac,.ogg">
 ```
 
 2. Add format detection in `script.js`:
 ```javascript
-fileFormat.textContent = file.name.split('.').pop().toUpperCase();
+const ext = file.name.split('.').pop().toLowerCase();
+fileFormat.textContent = (ext === 'm4a') ? "AAC/ALAC" : ext.toUpperCase();
 ```
 
 #### Customizing VU Meters
@@ -633,15 +715,26 @@ const SMOOTHING = 0.25;
 const POWER = 1.5;
 ```
 
+#### Adding New EQ Bands
+
+Modify `mcintosh-audio-engine.js`:
+
+```javascript
+// Add new frequencies to the array
+this.eqBands = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000, 20000];
+```
+
 #### Adding New Themes
 
 Create alternate color schemes in `style.css`:
 
 ```css
 :root {
-  --mc-led-blue: #00c3ff;    /* Primary accent */
-  --mc-led-green: #00ff41;   /* Secondary accent */
-  --mc-gold: #ffd700;        /* Highlights */
+  --mc-blue: #00c3ff;           /* Primary accent */
+  --mc-green: #00ff41;          /* Secondary accent */
+  --mc-gold: #786b46;           /* Highlights */
+  --background-color-app: #1b1b1b;  /* App background */
+  --chassis-shadow: #2e2e2e;    /* Chassis shadow */
 }
 ```
 
@@ -653,6 +746,7 @@ Create alternate color schemes in `style.css`:
 - **JavaScript**: Must be enabled
 - **Storage**: ~5MB for PWA cache (optional)
 - **Network**: Required for initial load (offline after PWA install)
+- **Display**: 1280x800 minimum (responsive down to tablet sizes)
 
 ### Desktop Version
 
@@ -666,7 +760,7 @@ Create alternate color schemes in `style.css`:
 
 ### Audio Files
 
-- **Supported formats**: FLAC, MP3, MP4/M4A, WAV
+- **Supported formats**: FLAC, MP3, MP4/M4A, WAV, AAC, ALAC, OGG
 - **Embedded metadata**: ID3v2 tags recommended for full functionality
 - **Album art**: Embedded in file (JPEG/PNG)
 - **File size**: No theoretical limit (browser memory dependent)
@@ -684,21 +778,27 @@ Contributions are welcome! Whether it's bug fixes, new features, or documentatio
    ```bash
    git checkout -b feature/amazing-feature
    ```
-1. **Make** your changes
-2. **Test** thoroughly across browsers
+
+3. **Make** your changes
+
+4. **Test** thoroughly across browsers
    - Chrome, Firefox, Safari minimum
-   - Test on mobile if changing UI
-1. **Commit** with clear messages:
+   - Test on mobile/tablet if changing UI
+   - Test all EQ bands and audio controls
+
+5. **Commit** with clear messages:
    
    ```bash
    git commit -m "Add amazing feature: detailed description"
    ```
-1. **Push** to your fork:
+
+6. **Push** to your fork:
    
    ```bash
    git push origin feature/amazing-feature
    ```
-1. **Submit** a pull request with:
+
+7. **Submit** a pull request with:
    - Clear description of changes
    - Screenshots/GIFs if visual changes
    - Test results
@@ -712,6 +812,7 @@ Contributions are welcome! Whether it's bug fixes, new features, or documentatio
 - Ensure backwards compatibility
 - Don't break existing features
 - Test PWA functionality if modifying service worker
+- Test EQ functionality if modifying audio engine
 - Update version number in manifest.json if applicable
 
 ### Bug Reports
@@ -833,7 +934,7 @@ This project pays homage to **McIntosh Laboratory**, legendary American manufact
 ### FAQ
 
 **Q: Why won't my audio files play?**
-A: Check that they're in a supported format (FLAC/MP3/WAV/MP4). Some browsers require user interaction before playing audio.
+A: Check that they're in a supported format (FLAC/MP3/WAV/MP4/AAC/OGG). Some browsers require user interaction before playing audio.
 
 **Q: Why can't I see album art?**
 A: Album art must be embedded in the file's ID3 tags. Use a tag editor like Mp3tag to add artwork.
@@ -856,12 +957,25 @@ A: Install Node.js, run `npm install`, then `npm run dist`. See the Desktop Vers
 **Q: Do the taskbar buttons work on macOS/Linux?**
 A: Taskbar thumbnail buttons are Windows-only. However, global media key shortcuts work on all platforms.
 
+**Q: What's the difference between the 10-band EQ and BASS/TREBLE?**
+A: BASS/TREBLE are classic tone controls (shelf filters) for quick adjustments. The 10-band EQ provides precise frequency control across the entire audio spectrum. They work together.
+
+**Q: How do I reset all EQ settings?**
+A: Use TONE RESET in the options menu to reset BASS/TREBLE and balance. Use FLAT in the EQ popup to reset all 10 bands to 0dB.
+
+**Q: Can I customize the visual appearance?**
+A: Yes! Use the BACK COLOR and SHADOW COLOR pickers in the options menu. The DISPLAY button also cycles through different visual states.
+
+**Q: Does this work on iPad?**
+A: Yes! The interface is optimized for tablets with responsive scaling and touch-friendly controls.
+
 -----
 <img width="1827" height="822" alt="2" src="https://github.com/user-attachments/assets/1451b7e9-3075-4fec-a4e4-048125788bfd" />
 <img width="1842" height="862" alt="3" src="https://github.com/user-attachments/assets/7d10e7c2-d6cf-46a1-89bf-13fa474eb961" />
 <img width="1829" height="823" alt="4" src="https://github.com/user-attachments/assets/bee9ec8c-6485-4f8c-b523-044c14632fb3" />
 <img width="1825" height="860" alt="5" src="https://github.com/user-attachments/assets/ee865f48-5028-4b6a-859d-5b9db2bba930" />
 <img width="1828" height="839" alt="6" src="https://github.com/user-attachments/assets/578bcfd3-4595-4ea7-8023-11bd68721737" />
+<img width="1825" height="836" alt="9" src="https://github.com/user-attachments/assets/de2084e6-b987-4bbd-82ed-cc80d7aaf47d" />
 <img width="1809" height="866" alt="7" src="https://github.com/user-attachments/assets/71bfeadd-fcf1-457e-b4b8-5c6ec14b47f7" />
 <img width="1799" height="806" alt="8" src="https://github.com/user-attachments/assets/71fa6119-9539-4417-b3a0-3f762483b370" />
 
