@@ -207,7 +207,11 @@ function loadTrack(index) {
     currentIndex = index; abMode = 0; updateVFDStatusDisplay();
     const file = playlist[currentIndex];
     trackCount.textContent = `${currentIndex + 1}/${playlist.length}`;
-    fileFormat.textContent = file.name.split('.').pop().toUpperCase();
+    
+    // --- MODIFICATION POUR AAC/ALAC/OGG ---
+    const ext = file.name.split('.').pop().toLowerCase();
+    fileFormat.textContent = (ext === 'm4a') ? "AAC/ALAC" : ext.toUpperCase();
+    
     audio.src = URL.createObjectURL(file);
     audio.onloadedmetadata = () => bitrateDisplay.textContent = Math.round(((file.size * 8) / audio.duration) / 1000) + " KBPS";
 
@@ -223,9 +227,9 @@ function loadTrack(index) {
                     let s = ""; for (let i = 0; i < img.data.length; i++) s += String.fromCharCode(img.data[i]);
                     popupImg.src = `data:${img.format};base64,${window.btoa(s)}`;
                 } else { popupImg.src = ""; }
-                updateMediaMetadata();
+                updateMediaMetadata(); // <-- APPEL MEDIA SESSION ICI
             },
-            onError: () => { vfdLarge.textContent = file.name.toUpperCase(); vfdInfo.textContent = "ARTIST – ALBUM"; setTimeout(() => fitText(vfdLarge, 30), 10); }
+            onError: () => { vfdLarge.textContent = file.name.toUpperCase(); vfdInfo.textContent = "ARTIST – ALBUM"; setTimeout(() => fitText(vfdLarge, 30), 10); updateMediaMetadata(); }
         });
     }
     engine.init();
@@ -249,6 +253,16 @@ timeDisplay.addEventListener('click', (e) => {
 audio.addEventListener('timeupdate', () => {
     if (!isPoweredOn || isNaN(audio.currentTime)) return;
     if (abMode === 2 && audio.currentTime >= pointB) audio.currentTime = pointA;
+    
+    // --- POSITION STATE POUR CHROME ---
+    if ('mediaSession' in navigator && !isNaN(audio.duration)) {
+        navigator.mediaSession.setPositionState({
+            duration: audio.duration,
+            playbackRate: audio.playbackRate,
+            position: audio.currentTime
+        });
+    }
+
     let s = isShowingRemaining ? audio.duration - audio.currentTime : audio.currentTime;
     const m = Math.floor(s / 60).toString().padStart(2, '0'), sec = Math.floor(s % 60).toString().padStart(2, '0');
     timeDisplay.textContent = `${isShowingRemaining ? '-' : ''}${m}:${sec}`;
@@ -341,7 +355,8 @@ libBtn.onclick = () => { if (isPoweredOn) modal.style.display = "block"; else sh
 closeBtn.onclick = () => modal.style.display = "none";
 
 folderInput.onchange = (e) => {
-    const files = Array.from(e.target.files).filter(f => f.type.startsWith('audio/'));
+    // MODIFIÉ POUR ACCEPTER AAC/ALAC/OGG
+    const files = Array.from(e.target.files).filter(f => f.type.startsWith('audio/') || f.name.endsWith('.m4a') || f.name.endsWith('.aac') || f.name.endsWith('.ogg'));
     if (files.length > 0) {
         playlist = files;
         fileList.innerHTML = "";
@@ -425,8 +440,43 @@ window.addEventListener('mouseup', () => clearInterval(volHoldInterval));
 volumeKnob.addEventListener('wheel', (e) => { if (isPoweredOn) { e.preventDefault(); currentVolume = e.deltaY < 0 ? Math.min(1, currentVolume + 0.05) : Math.max(0, currentVolume - 0.05); updateVolumeDisplay(); } });
 volumeKnob.addEventListener('mouseenter', () => { if (isPoweredOn) showVolumeBriefly(); });
 
-// --- MEDIA SESSION ---
-function updateMediaMetadata() { if ('mediaSession' in navigator && playlist.length > 0) { navigator.mediaSession.metadata = new MediaMetadata({ title: vfdLarge.textContent, artist: vfdInfo.textContent.split('–')[0].trim() }); } }
+// --- MEDIA SESSION (ACTION HANDLERS CORRIGÉS) ---
+function updateMediaMetadata() { 
+    if ('mediaSession' in navigator && playlist.length > 0) { 
+        navigator.mediaSession.metadata = new MediaMetadata({ 
+            title: vfdLarge.textContent, 
+            artist: vfdInfo.textContent.split('–')[0].trim(),
+            artwork: [
+                { src: popupImg.src.includes('data:') ? popupImg.src : 'assets/img/default.png', sizes: '512x512', type: 'image/png' }
+            ]
+        }); 
+        
+        navigator.mediaSession.setActionHandler('play', () => { engine.play(); updateStatusIcon('play'); });
+        navigator.mediaSession.setActionHandler('pause', () => { engine.pause(); updateStatusIcon('pause'); });
+        
+        // --- NAVIGATION CHROME CORRIGÉE ---
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+            if (audio.currentTime > 3) {
+                audio.currentTime = 0;
+            } else if (currentIndex > 0) {
+                loadTrack(currentIndex - 1);
+            } else if (repeatMode === 2) {
+                loadTrack(playlist.length - 1);
+            }
+        });
+        
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+            if (isRandom && playlist.length > 1) {
+                let n; do { n = Math.floor(Math.random() * playlist.length); } while (n === currentIndex);
+                loadTrack(n);
+            } else if (currentIndex < playlist.length - 1) {
+                loadTrack(currentIndex + 1);
+            } else if (repeatMode === 2) {
+                loadTrack(0);
+            }
+        });
+    } 
+}
 
 audio.onended = () => {
     if (repeatMode === 1) loadTrack(currentIndex);
@@ -505,7 +555,6 @@ const bgPicker = document.getElementById('bg-picker');
 bgPicker?.addEventListener('input', (e) => {
     const color = e.target.value;
     document.body.style.backgroundColor = color;
-    // On met à jour la couleur du bouton pour le feedback visuel
     document.getElementById('background-color-btn').style.background = color;
 });
 
@@ -515,8 +564,64 @@ shadowPicker?.addEventListener('input', (e) => {
     const color = e.target.value;
     const chassis = document.querySelector('.amplifier-panel');
     if (chassis) {
-        // Applique l'ombre selon tes réglages de base (0 60px 120px)
         chassis.style.boxShadow = `0 60px 120px ${color}`;
     }
     document.getElementById('shadow-color-btn').style.background = color;
+});
+
+// --- GESTION DE L'ÉGALISEUR 10 BANDES ---
+const eqBtn = document.getElementById('eq-btn');
+const eqPopup = document.getElementById('eq-popup');
+const closeEq = document.getElementById('close-eq');
+const eqResetBtn = document.getElementById('eq-reset-btn');
+const eqSliders = document.querySelectorAll('.eq-band input');
+
+// Ouvrir la pop-up
+eqBtn?.addEventListener('click', (e) => {
+    if (isPoweredOn) {
+        e.stopPropagation();
+        eqPopup.style.display = 'block';
+    } else {
+        showStatusBriefly("POWER ON FIRST");
+    }
+});
+
+// Fermer la pop-up
+closeEq?.addEventListener('click', () => {
+    eqPopup.style.display = 'none';
+});
+
+// Empêcher la fermeture quand on clique à l'intérieur de la pop-up
+eqPopup?.addEventListener('click', (e) => {
+    e.stopPropagation();
+});
+
+// Gestion des curseurs (Sliders)
+eqSliders.forEach(slider => {
+    slider.addEventListener('input', (e) => {
+        const freq = e.target.getAttribute('data-freq');
+        const gain = e.target.value;
+        
+        if (engine.setCustomFilter) {
+            engine.setCustomFilter(freq, gain);
+        }
+        
+        // Affiche la fréquence modifiée sur le VFD
+        showStatusBriefly(`${freq}Hz: ${gain > 0 ? '+' : ''}${gain}dB`);
+    });
+});
+
+// Bouton RESET (FLAT)
+eqResetBtn?.addEventListener('click', () => {
+    if (!isPoweredOn) return;
+
+    eqSliders.forEach(slider => {
+        slider.value = 0; 
+        const freq = slider.getAttribute('data-freq');
+        if (engine.setCustomFilter) {
+            engine.setCustomFilter(freq, 0);
+        }
+    });
+
+    showStatusBriefly("EQ FLAT (0dB)");
 });
