@@ -1196,7 +1196,7 @@ body {
     transform: translate(-50%, -50%);
     width: 500px;
     background: rgba(0, 0, 0, 0.95);
-    border: 5px solid var(--mc-gold, #b29671);
+    border: 8px solid var(--mc-gold, #b29671);
     border-radius: 15px;
     padding: 20px;
     z-index: 1000;
