@@ -975,6 +975,7 @@ A: Yes! The interface is optimized for tablets with responsive scaling and touch
 <img width="1829" height="823" alt="4" src="https://github.com/user-attachments/assets/bee9ec8c-6485-4f8c-b523-044c14632fb3" />
 <img width="1825" height="860" alt="5" src="https://github.com/user-attachments/assets/ee865f48-5028-4b6a-859d-5b9db2bba930" />
 <img width="1828" height="839" alt="6" src="https://github.com/user-attachments/assets/578bcfd3-4595-4ea7-8023-11bd68721737" />
+<img width="1825" height="836" alt="9" src="https://github.com/user-attachments/assets/de2084e6-b987-4bbd-82ed-cc80d7aaf47d" />
 <img width="1809" height="866" alt="7" src="https://github.com/user-attachments/assets/71bfeadd-fcf1-457e-b4b8-5c6ec14b47f7" />
 <img width="1799" height="806" alt="8" src="https://github.com/user-attachments/assets/71fa6119-9539-4417-b3a0-3f762483b370" />
 
