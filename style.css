@@ -7,7 +7,7 @@
     --panel-black: #080808;
     --mc-led-green: #00ff00;
     --mc-led-red: #ff0000;
-    --mc-red-button: #a10202;
+    --mc-red-button: #912624;
     --mc-gold: #786b46;
     --chassis-shadow: rgba(46, 46, 46, 0.8);
     --border-bottom: #2e2e2e;
@@ -535,7 +535,7 @@ body {
   height: 60%;
   
   /* Dégradé rouge pour le volume */
-  background: radial-gradient(circle, #e53935 0%, #b71c1c 100%);
+  background: radial-gradient(circle, #912624 0%, #912624 100%);
   
   border-radius: 100% / 15px;
   
@@ -559,7 +559,7 @@ body {
 .power-btn:active::after {
   /* L'insert s'enfonce et s'assombrit */
   transform: translateY(1px) scale(0.98);
-  background: radial-gradient(circle, #b71c1c 0%, #7f0000 100%);
+  background: radial-gradient(circle, #912624 0%, #912624 100%);
   box-shadow: 
     0 1px 2px rgba(0, 0, 0, 0.9),
     inset 0 2px 5px rgba(0, 0, 0, 0.6);
@@ -1213,7 +1213,7 @@ body {
 
 /* --- SPÉCIFICITÉS : ROUGE (YES) --- */
 .chassis-btn-yes::after {
-    background: radial-gradient(circle, #ff1744 0%, #a10202 100%);
+    background: radial-gradient(circle, #912624 0%, #912624 100%);
     border: 1.5px solid #000;
     box-shadow: 
         0 4px 6px rgba(0, 0, 0, 0.8),
@@ -1233,7 +1233,7 @@ body {
 }
 
 .chassis-btn-yes:active::after {
-    background: radial-gradient(circle, #a10202 0%, #7f0000 100%);
+    background: radial-gradient(circle, #912624 0%, #912624 100%);
 }
 
 /* Overlay de la pop-up Info */
