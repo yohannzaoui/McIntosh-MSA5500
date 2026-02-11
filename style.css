@@ -1367,10 +1367,14 @@ body {
     box-shadow: 0 0 5px #00ff66;
 }
 
-.eq-band span {
-    font-size: 15px;
-    color: #888;
-margin-top: 10px;
+.eq-band span{
+	color: var(--mc-green);
+    font-size: 10px;
+    font-weight: bold;
+ 	margin-top: 10px;
+    text-transform: uppercase;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
 }
 
 .close-eq {
@@ -1406,6 +1410,7 @@ margin-top: 10px;
     width: 100%;
     height: 100%;
 }
+
 
 /* On s'assure que l'input color passe par-dessus l'effet visuel ::after */
 .btn-base input[type="color"] {
