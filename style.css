@@ -1362,7 +1362,7 @@ body {
     appearance: none;
     width: 12px;
     height: 25px;
-    background: var(--mc-led-green, #00ff66);
+    background: var(--mc-blue);
     border-radius: 2px;
     box-shadow: 0 0 5px #00ff66;
 }
