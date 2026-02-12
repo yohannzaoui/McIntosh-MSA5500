@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@300&family=Roboto:wght@300;400&display=swap');
 
 :root {
-    --background-color-app: #1b1b1b;
+    --background-color-app: #3a3a3a;
     --mc-blue: #00c3ff;
     --mc-green: #00ff41;
     --panel-black: #080808;
@@ -165,32 +165,20 @@ body {
     width: 100%;
     height: 15px;
     /* Dégradé qui simule l'angle du métal */
-    background: linear-gradient(to top, 
-        #181818 0%, 
-        #181818 20%, 
-        #181818 80%, 
-        #181818 100%);
-    
-    /* Micro-reflet de finition */
-    border-radius: 0 0 0px 0px;
+    background-color: #181818;
 }
 
 /* Bordure métallique du HAUT (Bezel Top) */
 .amplifier-panel::before {
     content: "";
     position: absolute;
-    top: -10px; /* Positionné au-dessus du panneau */
+    top: -10px;
+    /* Positionné au-dessus du panneau */
     left: 0;
     width: 100%;
     height: 15px;
     /* Dégradé inversé pour simuler l'angle vers le haut */
-    background: linear-gradient(to top, 
-        #181818 0%, 
-        #181818 20%, 
-        #181818 80%, 
-        #181818 100%);
-    /* Reflet sur l'arête supérieure */
-    border-radius: 0px 0px 0 0;
+    background-color: #181818;
 }
 
 .meter-container {
@@ -294,7 +282,7 @@ body {
 }
 
 #track-count {
-    color: var(--mc-led-green);
+    color: var(--mc-blue);
     font-size: var(--police-size-counter);
     font-weight: 700;
     font-family: 'bitcount single', sans-serif;
@@ -473,18 +461,18 @@ body {
     width: 62px;
     height: 50px;
     /* Dégradé multicouche pour l'aspect verre/laque */
-    background: linear-gradient(180deg, 
-        #353535 0%, 
-        #1a1a1a 40%, 
-        #0a0a0a 50%, 
-        #000000 100%);
-    border-radius: 90% / 20px; 
+    background: linear-gradient(180deg,
+            #353535 0%,
+            #1a1a1a 40%,
+            #0a0a0a 50%,
+            #000000 100%);
+    border-radius: 90% / 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     /* Bordure plus claire pour définir l'arête brillante */
     border: 1px solid #3a3a3a;
-    box-shadow: 
+    box-shadow:
         0 4px 10px rgba(0, 0, 0, 0.9),
         /* Reflet blanc vif sur le rebord supérieur */
         inset 0 2px 3px rgba(255, 255, 255, 0.3),
@@ -502,10 +490,10 @@ body {
     height: 60%;
     background: #0d0d0d;
     border-radius: 100% / 15px;
-    transform: translateY(1px); 
-    box-shadow: 
-        0 4px 6px rgba(0, 0, 0, 0.8),    
-        0 -1px 2px rgba(255, 255, 255, 0.15); 
+    transform: translateY(1px);
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.8),
+        0 -1px 2px rgba(255, 255, 255, 0.15);
     border: 1px solid #222;
     transition: all 0.1s ease;
     /* Empêche l'effet visuel de bloquer le clic sur les inputs cachés */
@@ -518,14 +506,14 @@ body {
 .btn-base:active {
     transform: translateY(2px);
     /* Réduction du reflet au clic pour simuler l'enfoncement */
-    box-shadow: 
+    box-shadow:
         0 2px 5px rgba(0, 0, 0, 0.9),
         inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .btn-base:active::after {
     transform: translateY(1px) scale(0.96);
-    box-shadow: 
+    box-shadow:
         0 1px 2px rgba(0, 0, 0, 0.9),
         inset 0 2px 5px rgba(0, 0, 0, 0.6);
     background: #050505;
@@ -543,39 +531,39 @@ body {
 }
 
 .power-btn::after {
-  content: "";
-  width: 75%;
-  height: 60%;
-  
-  /* Dégradé rouge pour le volume */
-  background: radial-gradient(circle, #912624 0%, #912624 100%);
-  
-  border-radius: 100% / 15px;
-  
-  /* Décalage vers le bas pour l'effet "physique" */
-  transform: translateY(1px); 
-  
-  /* Effet sorti : ombre portée noire + bordure noire nette */
-  box-shadow: 
-    0 4px 6px rgba(0, 0, 0, 0.8),
-    0 -1px 2px rgba(255, 255, 255, 0.2);
-  
-  border: 2px solid #000;
-  transition: all 0.1s ease;
+    content: "";
+    width: 75%;
+    height: 60%;
+
+    /* Dégradé rouge pour le volume */
+    background: radial-gradient(circle, #912624 0%, #912624 100%);
+
+    border-radius: 100% / 15px;
+
+    /* Décalage vers le bas pour l'effet "physique" */
+    transform: translateY(1px);
+
+    /* Effet sorti : ombre portée noire + bordure noire nette */
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.8),
+        0 -1px 2px rgba(255, 255, 255, 0.2);
+
+    border: 2px solid #000;
+    transition: all 0.1s ease;
 }
 
 .power-btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
 }
 
 .power-btn:active::after {
-  /* L'insert s'enfonce et s'assombrit */
-  transform: translateY(1px) scale(0.98);
-  background: radial-gradient(circle, #912624 0%, #912624 100%);
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.9),
-    inset 0 2px 5px rgba(0, 0, 0, 0.6);
+    /* L'insert s'enfonce et s'assombrit */
+    transform: translateY(1px) scale(0.98);
+    background: radial-gradient(circle, #912624 0%, #912624 100%);
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.9),
+        inset 0 2px 5px rgba(0, 0, 0, 0.6);
 }
 
 
@@ -604,7 +592,7 @@ body {
 }
 
 #time-display {
-    color: var(--mc-led-green);
+    color: var(--mc-blue);
     font-family: 'bitcount single', sans-serif;
     font-size: var(--police-size-counter);
     font-weight: 700;
@@ -615,7 +603,7 @@ body {
 }
 
 #vfd-status-icon {
-    color: var(--mc-led-green);
+    color: var(--mc-blue);
     font-size: 30px;
     position: absolute;
     right: 20px;
@@ -637,7 +625,7 @@ body {
 }
 
 #volume-display {
-    color: var(--mc-led-green);
+    color: var(--mc-blue);
     font-family: 'bitcount single', sans-serif;
     font-size: 20px;
     font-weight: 700;
@@ -1174,43 +1162,45 @@ body {
 }
 
 /* --- STYLE COMMUN BRILLANT (YES & NO) --- */
-.chassis-btn, 
+.chassis-btn,
 .chassis-btn-yes {
     position: relative;
     /* On force les dimensions */
-    width: 60px !important; 
+    width: 60px !important;
     height: 50px !important;
     min-width: 60px;
     min-height: 50px;
-    
+
     /* On applique le look laqué McIntosh */
     background: linear-gradient(180deg, #353535 0%, #1a1a1a 40%, #0a0a0a 50%, #000000 100%);
-    border-radius: 90% / 20px; 
+    border-radius: 90% / 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 1px solid #3a3a3a;
-    box-shadow: 
+    box-shadow:
         0 4px 10px rgba(0, 0, 0, 0.9),
         inset 0 2px 3px rgba(255, 255, 255, 0.3),
         inset 0 -2px 5px rgba(0, 0, 0, 0.7);
-    
+
     cursor: pointer;
     transition: all 0.15s ease;
     overflow: hidden;
-    box-sizing: border-box; /* Important pour que la bordure ne change pas la taille */
+    box-sizing: border-box;
+    /* Important pour que la bordure ne change pas la taille */
     padding: 0;
     margin: 0;
 }
 
 /* --- L'INSERT COMMUN --- */
-.chassis-btn::after, 
+.chassis-btn::after,
 .chassis-btn-yes::after {
     content: "";
-    width: 75%; /* Légèrement agrandi pour l'équilibre visuel */
+    width: 75%;
+    /* Légèrement agrandi pour l'équilibre visuel */
     height: 60%;
     border-radius: 100% / 15px;
-    transform: translateY(1px); 
+    transform: translateY(1px);
     transition: all 0.1s ease;
     z-index: 1;
 }
@@ -1219,28 +1209,28 @@ body {
 .chassis-btn::after {
     background: #0d0d0d;
     border: 1px solid #222;
-    box-shadow: 
-        0 4px 6px rgba(0, 0, 0, 0.8),    
-        0 -1px 2px rgba(255, 255, 255, 0.15); 
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.8),
+        0 -1px 2px rgba(255, 255, 255, 0.15);
 }
 
 /* --- SPÉCIFICITÉS : ROUGE (YES) --- */
 .chassis-btn-yes::after {
     background: radial-gradient(circle, #912624 0%, #912624 100%);
     border: 1.5px solid #000;
-    box-shadow: 
+    box-shadow:
         0 4px 6px rgba(0, 0, 0, 0.8),
         0 -1px 2px rgba(255, 255, 255, 0.3);
 }
 
 /* --- ÉTATS ACTIFS (CLIC) --- */
-.chassis-btn:active, 
+.chassis-btn:active,
 .chassis-btn-yes:active {
     transform: translateY(2px);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
-.chassis-btn:active::after, 
+.chassis-btn:active::after,
 .chassis-btn-yes:active::after {
     transform: translateY(1px) scale(0.96);
 }
@@ -1296,7 +1286,7 @@ body {
 .streaming-label-container {
     position: absolute;
     width: 48%;
-    bottom: -18px;
+    bottom: -17px;
     left: 0;
     display: flex;
     align-items: center;
@@ -1330,7 +1320,7 @@ body {
     border-radius: 15px;
     padding: 20px;
     z-index: 1000;
-    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
     color: white;
     font-family: sans-serif;
 }
@@ -1380,11 +1370,11 @@ body {
     box-shadow: 0 0 5px #00ff66;
 }
 
-.eq-band span{
-	color: var(--mc-gold);
+.eq-band span {
+    color: var(--mc-gold);
     font-size: 10px;
     font-weight: bold;
- 	margin-top: 10px;
+    margin-top: 10px;
     text-transform: uppercase;
     text-align: center;
     font-family: 'Roboto', sans-serif;
@@ -1433,12 +1423,15 @@ body {
     width: 100%;
     height: 100%;
     cursor: pointer;
-    opacity: 0; /* Garde l'input invisible mais cliquable */
-    z-index: 10; /* Force l'input à être au-dessus de l'effet ::after */
+    opacity: 0;
+    /* Garde l'input invisible mais cliquable */
+    z-index: 10;
+    /* Force l'input à être au-dessus de l'effet ::after */
 }
 
 /* On s'assure que l'effet visuel ne bloque pas les clics */
 .btn-base::after {
-    pointer-events: none; /* Les clics passent à travers l'effet pour atteindre l'input */
+    pointer-events: none;
+    /* Les clics passent à travers l'effet pour atteindre l'input */
     z-index: 1;
 }
