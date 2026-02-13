@@ -13,8 +13,8 @@
     --border-bottom: #2e2e2e;
     --background-matrix-display: #020202;
     --background-option-menu: #000000;
-    --police-size-counter: 30px;
-    --police-size-label-counter: 12px;
+    --police-size-counter: 35px;
+    --police-size-label-counter: 15px;
 }
 
 /* --- COMPATIBILITÉ IPAD & TABLETTES --- */
@@ -290,7 +290,7 @@ body {
 }
 
 #file-format, #bitrate {
-    font-size: 15px;
+    font-size: 18px;
     opacity: 0.8;
 }
 
@@ -855,7 +855,7 @@ body {
 .loudness-indicator {
     display: none;
     margin-left: 12px;
-    font-size: 15px;
+    font-size: 18px;
     opacity: 0.8;
     color: var(--mc-blue);
     font-family: 'bitcount single', sans-serif;
@@ -1434,4 +1434,12 @@ body {
     pointer-events: none;
     /* Les clics passent à travers l'effet pour atteindre l'input */
     z-index: 1;
+}
+
+.sub-tech-row {
+    display: flex;
+    gap: 4px;
+    font-size: 1em;
+    margin-top: 4px;
+    white-space: nowrap;
 }
