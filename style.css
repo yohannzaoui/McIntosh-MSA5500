@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@300&family=Roboto:wght@300;400&display=swap');
 
 :root {
+    --release-number: "RELEASE 2.4.0";
     --background-color-app: #3a3a3a;
     --mc-blue: #00c3ff;
     --mc-green: #00ff41;
@@ -1484,4 +1485,20 @@ body {
     text-transform: uppercase;
     opacity: 0.8;
     text-shadow: 0 0 10px rgba(120, 107, 70, 0.5); /* Lueur dorée subtile */
+}
+
+.release-version::after {
+    /* On récupère la valeur de la variable */
+    content: var(--release-number);
+    
+    /* Le reste de ton style (centrage, typo, etc.) */
+    display: block;
+    margin-top: 20px;
+    color: var(--mc-gold);
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    text-shadow: 0 0 10px rgba(120, 107, 70, 0.5);
 }
