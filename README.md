@@ -28,7 +28,6 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
   - [Modular Components](#modular-components)
 - [Installation and Usage](#-installation-and-usage)
 - [Configuration](#-configuration)
-- [Roadmap](#-roadmap)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Disclaimer](#-disclaimer)
@@ -796,32 +795,6 @@ const urlsToCache = [
   // Add or remove URLs to cache
 ];
 ```
-
----
-
-## 🗺️ Roadmap
-
-### Version 2.5.0 (Q2 2026)
-- [ ] Streaming support (Spotify Web API, SoundCloud)
-- [ ] Real-time spectrum visualizer
-- [ ] Saveable equalizer presets
-- [ ] Crossfade between tracks
-- [ ] Synchronized lyrics/subtitle support
-
-### Version 3.0.0 (Q3 2026)
-- [ ] Synchronized multi-room mode
-- [ ] Audiophile format support (DSD, DSF)
-- [ ] Advanced FFT spectrum analyzer
-- [ ] DJ mode with beatmatching
-- [ ] Complete customizable themes
-
-### Features Under Consideration
-- External USB DAC support
-- MIDI control
-- Auto EQ mode (spectrum analysis)
-- Chromecast/AirPlay support
-- Native mobile app (React Native)
-
 ---
 
 ## 🤝 Contributing
