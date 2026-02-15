@@ -7,7 +7,7 @@ A premium web-based audio player inspired by the legendary McIntosh amplifier de
 ![Status](https://img.shields.io/badge/status-active-success)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-![McIntosh_Logo](https://github.com/user-attachments/assets/9f65f1d2-5f77-458b-b0fc-5ec35e992042)
+![543375630-9f65f1d2-5f77-458b-b0fc-5ec35e992042](https://github.com/user-attachments/assets/7bc36eb4-3abf-4167-862a-a5e87df7afc9)
 <img width="1805" height="802" alt="1" src="https://github.com/user-attachments/assets/24c1c6bd-37bd-4065-8a0f-c8c1a053f7f9" />
 
 ## ✨ Features
