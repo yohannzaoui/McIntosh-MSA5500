@@ -103,3 +103,17 @@
     width: 100%;
     height: 100%;
 }
+
+#eq-preset-name-display {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #bfa36a; /* Or McIntosh */
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    pointer-events: none; /* Pour ne pas gêner les clics sur le canvas */
+    opacity: 0.8;
+}
