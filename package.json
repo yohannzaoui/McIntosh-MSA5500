@@ -1,7 +1,7 @@
 {
-  "name": "McIntosh-MSA-5500",
-  "version": "2.5.0",
-  "description": "McIntosh-MSA-5500-Audio-Player",
+  "name": "McIntosh-DAP",
+  "version": "2.5.1",
+  "description": "McIntosh-Digital-Audio-Player",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
