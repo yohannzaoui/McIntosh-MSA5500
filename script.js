@@ -660,6 +660,7 @@ const presetLabels = {
     'eq-rock-btn': 'ROCK',
     'eq-jazz-btn': 'JAZZ',
     'eq-classic-btn': 'CLASSIC',
+    'eq-live-btn': 'LIVE',
     'eq-reset-btn': 'FLAT'
 };
 
@@ -668,6 +669,7 @@ const eqPresets = {
     'eq-rock-btn':    [5, 4, 2, 0, -1, 0, 1, 2, 4, 5],
     'eq-jazz-btn':    [2, 1, 0, 1, 2, 2, 1, 0, 0, -1],
     'eq-classic-btn': [4, 3, 2, 0, 0, 0, 0, 2, 3, 4],
+    'eq-live-btn':    [6, 4, 2, 0, 1, 2, 4, 5, 3, 2],
     'eq-reset-btn':   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 };
 
