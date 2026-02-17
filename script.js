@@ -715,7 +715,7 @@ function drawEQCurve() {
     eqCtx.shadowBlur = 0;
 }
 
-// Appliquer un preset (unique, fusion des comportements)
+// --- FONCTION APPLIQUER PRESET CORRIGÉE ---
 function applyPreset(btnId) {
     if (!isPoweredOn) return;
     
@@ -726,42 +726,34 @@ function applyPreset(btnId) {
     eqSliders.forEach((slider, index) => {
         slider.value = gains[index];
         const freq = slider.getAttribute('data-freq');
-        if (engine?.setCustomFilter) engine.setCustomFilter(freq, gains[index]);
+        if (engine && engine.setCustomFilter) {
+            engine.setCustomFilter(freq, gains[index]);
+        }
     });
 
     // 2. Préparer le nom du preset pour l'affichage
-    // On transforme "eq-rock-btn" en "ROCK"
     let presetName = btnId.replace('eq-', '').replace('-btn', '').toUpperCase();
-    
+    if (presetName === 'RESET') presetName = 'FLAT';
+
     // 3. Logique d'affichage sur le VFD (à côté du bitrate)
     const vfdPresetElement = document.getElementById('vfd-preset-display');
     if (vfdPresetElement) {
-        if (presetName === 'RESET' || presetName === 'FLAT') {
-            vfdPresetElement.innerText = ""; // On cache si c'est FLAT
+        if (presetName === 'FLAT') {
+            vfdPresetElement.innerText = ""; 
         } else {
-            vfdPresetElement.innerText = " | " + presetName; // On affiche avec un séparateur
+            vfdPresetElement.innerText = " | " + presetName;
         }
     }
 
-    // 4. Mise à jour de ton grand affichage central (optionnel)
+    // 4. Mise à jour de ton grand affichage central
     if (displayElement) {
-        displayElement.innerText = (presetName === 'RESET') ? 'FLAT' : presetName;
+        displayElement.innerText = presetName;
     }
 
-    // Feedback visuel
-    showStatusBriefly("PRESET: " + (presetName === 'RESET' ? 'FLAT' : presetName));
-    if (typeof drawEQCurve === 'function') drawEQCurve();
-}
-
-    // Mise à jour du nom affiché
-    let presetName = btnId.replace('eq-', '').replace('-btn', '').toUpperCase();
-    if (presetName === 'RESET') presetName = 'FLAT';
-    if (displayElement) displayElement.innerText = presetName;
-
+    // Feedback visuel et courbe
     showStatusBriefly("PRESET: " + presetName);
     drawEQCurve();
 }
-
 // Ouvrir la pop-up EQ
 eqBtn?.addEventListener('click', (e) => {
     if (isPoweredOn) {
