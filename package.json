@@ -9,13 +9,13 @@
   },
   "keywords": [],
   "author": "Yohann Zaoui",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^26.0.0",
     "electron-builder": "^24.6.4"
   },
   "build": {
-    "appId": "com.yohann.mcintoshDAP",
+    "appId": "com.HDSoundSystem.mcintoshDAP",
     "productName": "McIntosh-DAP",
     "win": {
       "icon": "assets/img/favicon.ico",
